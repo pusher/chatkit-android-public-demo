@@ -18,4 +18,18 @@
 
         />
 
+    <Button
+        android:id="@+id/btnMarketplaceBuyer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintTop_toBottomOf="@id/btnMarketplaceSeller"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        android:text="Marketplace Buyer"
+
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,7 @@ package com.pusher.demo.features.marketplace
 import android.content.Context
 import com.pusher.chatkit.*
 import com.pusher.chatkit.messages.multipart.Message
+import com.pusher.chatkit.rooms.Room
 import com.pusher.chatkit.rooms.RoomListeners
 import com.pusher.chatkit.users.User
 import com.pusher.demo.features.BasePresenter
@@ -19,11 +20,13 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
         fun onMessageReceived(message: Message)
     }
 
-    private val INSTANCE_LOCATOR = "v1:us1:68fbe60c-9d50-4842-beb8-1a06f136eeba"
-    private val TOKEN_PROVIDER_URL = "https://us1.pusherplatform.io/services/chatkit_token_provider/v1/68fbe60c-9d50-4842-beb8-1a06f136eeba/token"
+    private val INSTANCE_LOCATOR = "FILL_ME_IN"
+    private val TOKEN_PROVIDER_URL = "FILL_ME_IN"
 
     private lateinit var chatManager: ChatManager
     private lateinit var currentUser: CurrentUser
+
+    private lateinit var room: Room
 
     fun connect(context: Context, userId: String) {
 
@@ -69,10 +72,11 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
 
     private fun subscribeToRoom() {
 
-        val roomId = "buyer:seller"
-        //subscribe to room
+        room = currentUser.rooms.find { room -> room.name == "buyer:seller" }!!
+
+        //subscribe to the room
         currentUser.subscribeToRoomMultipart(
-            roomId = roomId ,
+            roomId = room.id ,
             listeners = RoomListeners(
                 onMultipartMessage = { message ->
                     if (isViewAttached()) {
@@ -80,7 +84,8 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
                     }
                 },
                 onPresenceChange = { person ->
-                    if (isViewAttached()) {
+                    if (isViewAttached() &&
+                            person.id != currentUser.id) {
                         view?.onMemberPresenceChanged(person)
                     }
                 }
@@ -88,28 +93,46 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
             messageLimit = 20,
             callback = { subscription ->
                 //success
+                getMembersForRoom(room)
             }
         )
+    }
 
+    private fun getMembersForRoom(room: Room){
         //get members for room
-        currentUser.usersForRoom(roomId, callback = { result ->
+        currentUser.usersForRoom( room.id, callback = { result ->
             when (result) {
                 is Result.Success -> {
                     if (isViewAttached()) {
-                        //we can assume first because this is only a 1:1 group
-                        view?.onOtherMember(result.value.first())
+                        view?.onOtherMember(result.value.find { user-> user.id != currentUser.id }!!)
                     }
                 }
 
                 is Result.Failure -> {
-                    //you'd want to handle this error differently
+                    //you'd probably want to handle this error differently
                     if (isViewAttached()) {
                         view?.onError(result.error.reason)
                     }
                 }
             }
         })
-
-
     }
+
+    fun sendMessageToRoom(message: String) {
+
+        currentUser.sendSimpleMessage(room, message,
+            callback = { result ->
+                when (result) {
+                    is Result.Success -> {
+                        // message is already displayed
+                    }
+                    is Result.Failure -> {
+                        if (isViewAttached()){
+                            view?.onError(result.error.reason)
+                        }
+                    }
+                }
+        })
+    }
+
 }

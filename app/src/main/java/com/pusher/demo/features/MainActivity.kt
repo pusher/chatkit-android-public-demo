@@ -4,8 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.pusher.demo.R
-import com.pusher.demo.features.marketplace.MarketplacePresenter
-import com.pusher.demo.features.marketplace.SellerActivity
+import com.pusher.demo.features.marketplace.MarketplaceActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -16,7 +15,15 @@ class MainActivity : AppCompatActivity() {
 
         //open the seller style chat
         btnMarketplaceSeller.setOnClickListener {
-            startActivity(Intent(this, SellerActivity::class.java))
+            val intent = Intent(this, MarketplaceActivity::class.java)
+            intent.putExtra(MarketplaceActivity.EXTRA_USER_ID, "seller")
+            startActivity(intent)
+        }
+
+        btnMarketplaceBuyer.setOnClickListener {
+            val intent = Intent(this, MarketplaceActivity::class.java)
+            intent.putExtra(MarketplaceActivity.EXTRA_USER_ID, "buyer")
+            startActivity(intent)
         }
     }
 }
