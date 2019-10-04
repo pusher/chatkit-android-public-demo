@@ -1,10 +1,9 @@
 package com.pusher.demo.features.marketplace
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -18,7 +17,7 @@ import kotlinx.android.synthetic.main.activity_seller.*
 class MarketplaceActivity : AppCompatActivity(), MarketplacePresenter.View {
 
     companion object {
-        val EXTRA_USER_ID = "com.pusher.demo.features.marketplace.EXTRA_USER_ID"
+        const val EXTRA_USER_ID = "com.pusher.demo.features.marketplace.EXTRA_USER_ID"
     }
 
     private lateinit var adapter: MessageAdapter
@@ -29,6 +28,7 @@ class MarketplaceActivity : AppCompatActivity(), MarketplacePresenter.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_seller)
 
+        //get the user id from the intent
         val userId = intent.getStringExtra(EXTRA_USER_ID)!!
 
         presenter.onViewAttached(this)
@@ -36,9 +36,8 @@ class MarketplaceActivity : AppCompatActivity(), MarketplacePresenter.View {
         //tell our presenter to connect as the seller user
         presenter.connect(this, userId)
 
-
         //set up our recyclerview adapter
-        adapter = MessageAdapter(applicationContext, userId)
+        adapter = MessageAdapter(userId)
         val layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         layoutManager.stackFromEnd = true
         recyclerViewMessages.layoutManager =  layoutManager

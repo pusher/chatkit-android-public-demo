@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        //open the buyer style chat
         btnMarketplaceBuyer.setOnClickListener {
             val intent = Intent(this, MarketplaceActivity::class.java)
             intent.putExtra(MarketplaceActivity.EXTRA_USER_ID, "buyer")

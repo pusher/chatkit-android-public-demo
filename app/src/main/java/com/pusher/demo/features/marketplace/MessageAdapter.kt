@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import com.pusher.chatkit.messages.multipart.Message
 import com.pusher.demo.R
 
-class MessageAdapter(val context: Context, val currentUserId: String)
+class MessageAdapter(private val currentUserId: String)
     : androidx.recyclerview.widget.RecyclerView.Adapter<MessageViewHolder>() {
 
     var messages = mutableListOf<Message>()
@@ -14,7 +14,7 @@ class MessageAdapter(val context: Context, val currentUserId: String)
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): MessageViewHolder {
         return MessageViewHolder(
             LayoutInflater.from(parent.context)
-                .inflate(R.layout.row_message, parent, false), context
+                .inflate(R.layout.row_message, parent, false)
         )
     }
 

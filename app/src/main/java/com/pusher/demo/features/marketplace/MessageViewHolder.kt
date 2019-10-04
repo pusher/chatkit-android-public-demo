@@ -7,7 +7,7 @@ import com.pusher.chatkit.messages.multipart.Payload
 import kotlinx.android.synthetic.main.row_message.view.*
 
 
-class MessageViewHolder (itemView: View, val context: Context)
+class MessageViewHolder (itemView: View)
     : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
     fun bind(message: Message, currentUserId: String){
