@@ -3,6 +3,8 @@
 This is a working demo app for the following use cases of Chatkit:
 * Marketplace - with a buyer and seller user
 
+![https://media.giphy.com/media/YRu7AZMm8Q2Qxk2mRr/giphy.gif](video of marketplace demo)
+
 ## Getting Started
 
 This app assumes you have some understanding of Chatkit, at the very minimum you should have followed the getting started tutorial at [https://pusher.com/docs/chatkit/getting_started/android](https://pusher.com/docs/chatkit/getting_started/android).
