@@ -8,7 +8,6 @@ import com.pusher.chatkit.rooms.RoomListeners
 import com.pusher.chatkit.users.User
 import com.pusher.demo.features.BasePresenter
 import com.pusher.util.Result
-import elements.Error
 
 class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
 
@@ -20,8 +19,7 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
         fun onMessageReceived(message: Message)
     }
 
-    private val INSTANCE_LOCATOR = "FILL_ME_IN"
-    private val TOKEN_PROVIDER_URL = "FILL_ME_IN"
+    private val LOG_TAG = "DEMO_APP"
 
     private lateinit var chatManager: ChatManager
     private lateinit var currentUser: CurrentUser
@@ -47,23 +45,12 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
         chatManager.connect(
             listeners = ChatListeners(),
             callback = { result ->
-                when (result) {
-                    is Result.Success -> {
-                        result.value.let { user ->
-                            currentUser = user
-                            if (isViewAttached()) {
-                                view?.onConnected(user)
-                            }
-
-                            subscribeToRoom()
-                        }
-                    }
-
-                    is Error -> {
-                        if (isViewAttached()) {
-                            view?.onError(result.reason)
-                        }
-                    }
+                result.map { user ->
+                    currentUser = user
+                    view?.onConnected(user)
+                    subscribeToRoom()
+                }.recover { error ->
+                    view?.onError(error.reason)
                 }
             }
         )
@@ -79,13 +66,10 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
             roomId = room.id ,
             listeners = RoomListeners(
                 onMultipartMessage = { message ->
-                    if (isViewAttached()) {
-                        view?.onMessageReceived(message)
-                    }
+                    view?.onMessageReceived(message)
                 },
                 onPresenceChange = { person ->
-                    if (isViewAttached() &&
-                            person.id != currentUser.id) {
+                    if (person.id != currentUser.id) {
                         view?.onMemberPresenceChanged(person)
                     }
                 }
@@ -103,16 +87,12 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
         currentUser.usersForRoom( room.id, callback = { result ->
             when (result) {
                 is Result.Success -> {
-                    if (isViewAttached()) {
-                        view?.onOtherMember(result.value.find { user-> user.id != currentUser.id }!!)
-                    }
+                    view?.onOtherMember(result.value.find { user-> user.id != currentUser.id }!!)
                 }
 
                 is Result.Failure -> {
                     //you'd probably want to handle this error differently
-                    if (isViewAttached()) {
-                        view?.onError(result.error.reason)
-                    }
+                    view?.onError(result.error.reason)
                 }
             }
         })
@@ -127,9 +107,7 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
                         // message is already displayed
                     }
                     is Result.Failure -> {
-                        if (isViewAttached()){
-                            view?.onError(result.error.reason)
-                        }
+                        view?.onError(result.error.reason)
                     }
                 }
         })
