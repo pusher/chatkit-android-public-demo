@@ -8,7 +8,6 @@ import com.pusher.chatkit.rooms.Room
 import com.pusher.chatkit.rooms.RoomListeners
 import com.pusher.chatkit.users.User
 import com.pusher.demo.features.BasePresenter
-import com.pusher.util.Result
 
 class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
 
