@@ -20,6 +20,8 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
     }
 
     private val LOG_TAG = "DEMO_APP"
+    private val INSTANCE_LOCATOR = "FILL_ME_IN"
+    private val TOKEN_PROVIDER_URL = "FILL_ME_IN"
 
     private lateinit var chatManager: ChatManager
     private lateinit var currentUser: CurrentUser
