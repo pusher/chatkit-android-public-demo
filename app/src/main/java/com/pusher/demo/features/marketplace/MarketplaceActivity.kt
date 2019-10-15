@@ -57,7 +57,8 @@ class MarketplaceActivity : AppCompatActivity(), MarketplacePresenter.View {
 
     override fun onError(exception: String) {
         runOnUiThread {
-            Toast.makeText(this, exception, Toast.LENGTH_SHORT).show()
+            txtMessage.isEnabled = false
+            lblError.text = exception
         }
 
     }

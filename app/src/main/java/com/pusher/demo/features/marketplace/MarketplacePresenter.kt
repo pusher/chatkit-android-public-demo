@@ -1,6 +1,7 @@
 package com.pusher.demo.features.marketplace
 
 import android.content.Context
+import android.util.Log
 import com.pusher.chatkit.*
 import com.pusher.chatkit.messages.multipart.Message
 import com.pusher.chatkit.rooms.Room
@@ -50,6 +51,7 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
                     view?.onConnected(user)
                     subscribeToRoom()
                 }.recover { error ->
+                    Log.e(LOG_TAG, error.reason)
                     view?.onError(error.reason)
                 }
             }
@@ -59,7 +61,15 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
 
     private fun subscribeToRoom() {
 
-        room = currentUser.rooms.find { room -> room.name == "buyer:seller" }!!
+        val usersRoom =  currentUser.rooms.find { room -> room.name == "buyer:seller" }
+
+        if (usersRoom == null) {
+            view?.onError("Could not subscribe to buyer:seller room - have you created the sample data?")
+            Log.e(LOG_TAG, "Could not subscribe to buyer:seller room - have you created the sample data?")
+            return
+        }
+
+        room = usersRoom
 
         //subscribe to the room
         currentUser.subscribeToRoomMultipart(
@@ -85,15 +95,11 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
     private fun getMembersForRoom(room: Room){
         //get members for room
         currentUser.usersForRoom( room.id, callback = { result ->
-            when (result) {
-                is Result.Success -> {
-                    view?.onOtherMember(result.value.find { user-> user.id != currentUser.id }!!)
-                }
-
-                is Result.Failure -> {
-                    //you'd probably want to handle this error differently
-                    view?.onError(result.error.reason)
-                }
+            result.map {members ->
+                view?.onOtherMember(members.find { user-> user.id != currentUser.id }!!)
+            }.recover { error ->
+                Log.e(LOG_TAG, error.reason)
+                view?.onError(error.reason)
             }
         })
     }
@@ -102,13 +108,10 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
 
         currentUser.sendSimpleMessage(room, message,
             callback = { result ->
-                when (result) {
-                    is Result.Success -> {
-                        // message is already displayed
-                    }
-                    is Result.Failure -> {
-                        view?.onError(result.error.reason)
-                    }
+                result.map {
+                    // message is already displayed - we don't need to do anything else
+                }.recover { error ->
+                    view?.onError(error.reason)
                 }
         })
     }
