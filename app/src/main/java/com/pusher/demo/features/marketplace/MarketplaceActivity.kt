@@ -1,6 +1,7 @@
 package com.pusher.demo.features.marketplace
 
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -59,6 +60,7 @@ class MarketplaceActivity : AppCompatActivity(), MarketplacePresenter.View {
         runOnUiThread {
             txtMessage.isEnabled = false
             lblError.text = exception
+            recyclerViewMessages.visibility = View.GONE
         }
 
     }

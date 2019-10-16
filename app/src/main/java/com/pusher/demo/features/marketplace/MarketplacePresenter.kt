@@ -97,7 +97,13 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
         //get members for room
         currentUser.usersForRoom( room.id, callback = { result ->
             result.map {members ->
-                view?.onOtherMember(members.find { user-> user.id != currentUser.id }!!)
+                val otherMember = members.find { user-> user.id != currentUser.id }
+                if (otherMember == null) {
+                    Log.e(LOG_TAG, "could not find the other user to talk to - " +
+                            "have you created the sample data?")
+                } else {
+                    view?.onOtherMember(otherMember)
+                }
             }.recover { error ->
                 Log.e(LOG_TAG, error.reason)
                 view?.onError(error.reason)
@@ -109,10 +115,9 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
 
         currentUser.sendSimpleMessage(room, message,
             callback = { result ->
-                result.map {
-                    // message is already displayed - we don't need to do anything else
-                }.recover { error ->
+                result.recover { error ->
                     view?.onError(error.reason)
+                    Log.e(LOG_TAG, error.reason)
                 }
         })
     }
