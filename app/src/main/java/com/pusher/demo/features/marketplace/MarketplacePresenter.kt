@@ -8,6 +8,7 @@ import com.pusher.chatkit.rooms.Room
 import com.pusher.chatkit.rooms.RoomListeners
 import com.pusher.chatkit.users.User
 import com.pusher.demo.features.BasePresenter
+import com.pusher.util.Result
 
 class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
 
@@ -47,14 +48,21 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
         chatManager.connect(
             listeners = ChatListeners(),
             callback = { result ->
-                result.map { user ->
-                    currentUser = user
-                    view?.onConnected(user)
-                    subscribeToRoom()
-                }.recover { error ->
-                    Log.e(LOG_TAG, error.reason)
-                    view?.onError(error.reason)
+                when (result) {
+
+                    is Result.Success -> {
+                        result.value.let { user ->
+                            currentUser = user
+                            view?.onConnected(user)
+                            subscribeToRoom()
+                        }
+                    }
+
+                    is Result.Failure -> {
+                        handleError(result.error.reason)
+                    }
                 }
+
             }
         )
 
@@ -65,8 +73,7 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
         val usersRoom =  currentUser.rooms.find { room -> room.name == "buyer:seller" }
 
         if (usersRoom == null) {
-            view?.onError("Could not subscribe to buyer:seller room - have you created the sample data?")
-            Log.e(LOG_TAG, "Could not subscribe to buyer:seller room - have you created the sample data?")
+            handleError("Could not subscribe to buyer:seller room - have you created the sample data?")
             return
         }
 
@@ -96,17 +103,25 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
     private fun getMembersForRoom(room: Room){
         //get members for room
         currentUser.usersForRoom( room.id, callback = { result ->
-            result.map {members ->
-                val otherMember = members.find { user-> user.id != currentUser.id }
-                if (otherMember == null) {
-                    Log.e(LOG_TAG, "could not find the other user to talk to - " +
-                            "have you created the sample data?")
-                } else {
-                    view?.onOtherMember(otherMember)
+            when (result) {
+
+                is Result.Success -> {
+                    result.value.let { members ->
+                        //check we actually have another user to talk to
+                        val otherMember = members.find { user-> user.id != currentUser.id }
+                        if (otherMember == null) {
+                            handleError("could not find the other user to talk to - " +
+                                    "have you created the sample data?")
+                        } else {
+                            view?.onOtherMember(otherMember)
+                        }
+                    }
                 }
-            }.recover { error ->
-                Log.e(LOG_TAG, error.reason)
-                view?.onError(error.reason)
+
+                is Result.Failure -> {
+                    handleError(result.error.reason)
+                }
+
             }
         })
     }
@@ -115,11 +130,21 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
 
         currentUser.sendSimpleMessage(room, message,
             callback = { result ->
-                result.recover { error ->
-                    view?.onError(error.reason)
-                    Log.e(LOG_TAG, error.reason)
+                when (result) {
+
+                    //we handle the success automatically by display the message
+
+                    is Result.Failure -> {
+                        handleError(result.error.reason)
+                    }
+
                 }
         })
+    }
+
+    private fun handleError(error: String) {
+        Log.e(LOG_TAG, error)
+        view?.onError(error)
     }
 
 }
