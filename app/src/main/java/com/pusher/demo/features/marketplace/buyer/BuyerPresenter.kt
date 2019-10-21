@@ -16,7 +16,7 @@ class BuyerPresenter : BasePresenter<BuyerPresenter.View>(){
 
         ChatkitManager.connect(
             context,
-            "seller",
+            "buyer",
             object : ChatkitManager.ChatManagerConnectedListener {
                 override fun onConnected(user: CurrentUser) {
                     view?.onConnected(user)

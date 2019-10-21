@@ -46,8 +46,8 @@ object ChatkitManager {
                         }
                     }
 
-                    is Error -> {
-                        listener.onError(result.reason)
+                    is Result.Failure -> {
+                        listener.onError(result.error.reason)
                     }
                 }
             }
