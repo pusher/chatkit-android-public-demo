@@ -1,4 +1,4 @@
-package com.pusher.demo.features.marketplace
+package com.pusher.demo.features.marketplace.chat
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

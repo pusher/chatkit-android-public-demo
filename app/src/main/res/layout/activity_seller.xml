@@ -4,72 +4,101 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".features.marketplace.MarketplaceActivity">
+    tools:context=".features.marketplace.seller.SellerActivity">
 
-    <!-- top bar-->
-    <RelativeLayout
+    <View
         android:id="@+id/containerTopBar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:elevation="5dp"
         android:background="@color/colorPrimaryDark"
         android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        >
+        />
 
-        <ImageView
-            android:id="@+id/imgStatus"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="20dp"
-            android:layout_centerVertical="true"
-            />
-
-        <TextView
-            android:id="@+id/lblName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_alignTop="@id/imgStatus"
-            android:layout_alignBottom="@id/imgStatus"
-            android:gravity="center_vertical"
-            android:textColor="@color/light_text"
-            android:textSize="18sp"
-            android:ellipsize="end"
-            android:layout_toEndOf="@id/imgStatus"
-            />
-
-    </RelativeLayout>
-
-    <!-- bottom bar-->
-    <FrameLayout
-        android:id="@+id/containerBottomBar"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/light_orange"
-        android:layout_alignParentBottom="true"
-        android:elevation="5dp"
-        >
-        <EditText
-            android:id="@+id/txtMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:singleLine="true"
-            android:imeOptions="actionSend"/>
-    </FrameLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewMessages"
+    <RelativeLayout
+        android:id="@+id/containerContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/containerTopBar"
-        android:layout_above="@id/containerBottomBar"
+        android:padding="20dp">
+
+        <RelativeLayout
+            android:id="@+id/containerProduct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <ImageView
+                android:id="@+id/imgProduct"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_hot_tub"
+                />
+
+            <TextView
+                android:id="@+id/lblProductTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/imgProduct"
+                android:layout_alignTop="@id/imgProduct"
+                android:layout_alignBottom="@id/imgProduct"
+                android:layout_marginStart="20dp"
+                android:gravity="center_vertical"
+                android:textSize="24sp"
+                android:text="£30 - 1 luxury hot tub"
+                android:textColor="@color/dark_text"
+                />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/lblConversationsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="(1) conversations"
+            android:layout_below="@id/containerProduct"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:textSize="18sp"
+            android:textColor="@color/dark_text"
+            />
+
+        <RelativeLayout
+            android:id="@+id/containerConversation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lblConversationsTitle"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            >
+
+            <ImageView
+                android:id="@+id/imgProfile"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/icon_profile_outline"
+                />
+            <TextView
+                android:id="@+id/lblProfile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/imgProfile"
+                android:layout_alignTop="@id/imgProfile"
+                android:layout_alignBottom="@id/imgProfile"
+                android:gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:text="Miss Buyer"
+                android:textColor="@color/dark_text"
+                />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/lblError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textColor="@color/dark_text"
         />
 
     <TextView

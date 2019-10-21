@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".features.marketplace.buyer.BuyerActivity">
+
+    <View
+        android:id="@+id/containerTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorPrimaryDark"
+        android:orientation="horizontal"
+        />
+
+    <RelativeLayout
+        android:id="@+id/containerContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/containerTopBar"
+        android:padding="20dp">
+
+        <ImageView
+            android:id="@+id/imgProduct"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_hot_tub"/>
+
+        <TextView
+            android:id="@+id/lblProductTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/imgProduct"
+            android:layout_marginStart="20dp"
+            android:text="Luxury Hot Tub!"
+            android:textSize="24sp"
+            android:textColor="@color/dark_text"
+            />
+
+        <TextView
+            android:id="@+id/lblProductCost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/imgProduct"
+            android:layout_below="@id/lblProductTitle"
+            android:layout_marginStart="20dp"
+            android:text="£30"
+            android:textSize="18sp"
+            android:textColor="@color/dark_text"
+            />
+
+        <TextView
+            android:id="@+id/lblProductDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/imgProduct"
+            android:layout_marginTop="20dp"
+            android:text="@string/product_description"
+            android:textColor="@color/dark_text"
+            android:textSize="14sp"
+            />
+
+        <Button
+            android:id="@+id/btnMessageSeller"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Message Seller"
+            android:layout_below="@id/lblProductDescription"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/lblError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textColor="@color/dark_text"
+        />
+
+</RelativeLayout>
