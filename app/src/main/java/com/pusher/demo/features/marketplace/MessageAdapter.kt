@@ -1,6 +1,5 @@
 package com.pusher.demo.features.marketplace
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.pusher.chatkit.messages.multipart.Message

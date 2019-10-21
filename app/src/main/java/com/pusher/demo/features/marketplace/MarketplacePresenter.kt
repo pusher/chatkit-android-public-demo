@@ -1,6 +1,7 @@
 package com.pusher.demo.features.marketplace
 
 import android.content.Context
+import android.util.Log
 import com.pusher.chatkit.*
 import com.pusher.chatkit.messages.multipart.Message
 import com.pusher.chatkit.rooms.Room
@@ -8,7 +9,6 @@ import com.pusher.chatkit.rooms.RoomListeners
 import com.pusher.chatkit.users.User
 import com.pusher.demo.features.BasePresenter
 import com.pusher.util.Result
-import elements.Error
 
 class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
 
@@ -20,6 +20,7 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
         fun onMessageReceived(message: Message)
     }
 
+    private val LOG_TAG = "DEMO_APP"
     private val INSTANCE_LOCATOR = "FILL_ME_IN"
     private val TOKEN_PROVIDER_URL = "FILL_ME_IN"
 
@@ -48,23 +49,20 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
             listeners = ChatListeners(),
             callback = { result ->
                 when (result) {
+
                     is Result.Success -> {
                         result.value.let { user ->
                             currentUser = user
-                            if (isViewAttached()) {
-                                view?.onConnected(user)
-                            }
-
+                            view?.onConnected(user)
                             subscribeToRoom()
                         }
                     }
 
-                    is Error -> {
-                        if (isViewAttached()) {
-                            view?.onError(result.reason)
-                        }
+                    is Result.Failure -> {
+                        handleError(result.error.reason)
                     }
                 }
+
             }
         )
 
@@ -72,20 +70,24 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
 
     private fun subscribeToRoom() {
 
-        room = currentUser.rooms.find { room -> room.name == "buyer:seller" }!!
+        val usersRoom =  currentUser.rooms.find { room -> room.name == "buyer:seller" }
+
+        if (usersRoom == null) {
+            handleError("Could not subscribe to buyer:seller room - have you created the sample data?")
+            return
+        }
+
+        room = usersRoom
 
         //subscribe to the room
         currentUser.subscribeToRoomMultipart(
             roomId = room.id ,
             listeners = RoomListeners(
                 onMultipartMessage = { message ->
-                    if (isViewAttached()) {
-                        view?.onMessageReceived(message)
-                    }
+                    view?.onMessageReceived(message)
                 },
                 onPresenceChange = { person ->
-                    if (isViewAttached() &&
-                            person.id != currentUser.id) {
+                    if (person.id != currentUser.id) {
                         view?.onMemberPresenceChanged(person)
                     }
                 }
@@ -102,18 +104,24 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
         //get members for room
         currentUser.usersForRoom( room.id, callback = { result ->
             when (result) {
+
                 is Result.Success -> {
-                    if (isViewAttached()) {
-                        view?.onOtherMember(result.value.find { user-> user.id != currentUser.id }!!)
+                    result.value.let { members ->
+                        //check we actually have another user to talk to
+                        val otherMember = members.find { user-> user.id != currentUser.id }
+                        if (otherMember == null) {
+                            handleError("could not find the other user to talk to - " +
+                                    "have you created the sample data?")
+                        } else {
+                            view?.onOtherMember(otherMember)
+                        }
                     }
                 }
 
                 is Result.Failure -> {
-                    //you'd probably want to handle this error differently
-                    if (isViewAttached()) {
-                        view?.onError(result.error.reason)
-                    }
+                    handleError(result.error.reason)
                 }
+
             }
         })
     }
@@ -123,16 +131,20 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
         currentUser.sendSimpleMessage(room, message,
             callback = { result ->
                 when (result) {
-                    is Result.Success -> {
-                        // message is already displayed
-                    }
+
+                    //we handle the success automatically by display the message
+
                     is Result.Failure -> {
-                        if (isViewAttached()){
-                            view?.onError(result.error.reason)
-                        }
+                        handleError(result.error.reason)
                     }
+
                 }
         })
+    }
+
+    private fun handleError(error: String) {
+        Log.e(LOG_TAG, error)
+        view?.onError(error)
     }
 
 }
