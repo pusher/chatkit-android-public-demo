@@ -1,19 +1,21 @@
 package com.pusher.demo.features.marketplace.seller
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.pusher.chatkit.CurrentUser
+import com.pusher.chatkit.rooms.Room
+import com.pusher.chatkit.users.User
 import com.pusher.demo.R
-import com.pusher.demo.features.marketplace.chat.MarketplaceChatActivity
 import kotlinx.android.synthetic.main.activity_seller.*
 
 class SellerActivity : AppCompatActivity(),
     SellerPresenter.View {
 
     private val presenter = SellerPresenter()
+    private val adapter = PersonAdapter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,19 +36,51 @@ class SellerActivity : AppCompatActivity(),
             lblError.visibility = View.GONE
 
             containerProduct.setOnClickListener {
-                Toast.makeText(this, "go to your product description",
+                Toast.makeText(this, "you would go to the product description",
                     Toast.LENGTH_SHORT).show()
             }
 
-            containerConversation.setOnClickListener {
-                startActivity(Intent(this, MarketplaceChatActivity::class.java))
-            }
+            displayConversations(user.rooms)
         }
+    }
+
+    fun displayConversations(rooms: List<Room>) {
+
+        // you'd probably want to save on your backend which conversations relate to which product
+        // because we only have 1 product we can assume all conversations are to dow ith it!
+
+        lblConversationsTitle.text =
+            resources.getQuantityText(R.plurals.numberOfPeopleInterested, rooms.size)
+
+        //set up our recyclerview
+        recyclerViewPeople.layoutManager =  LinearLayoutManager(this)
+        recyclerViewPeople.adapter = adapter
+
+        //currently we have to subscribe to the room to get the people but we can change this soon!
+        for (room in rooms) {
+            presenter.subscribeToRoom(room)
+        }
+
     }
 
     override fun onError(error: String) {
         runOnUiThread {
             lblError.text = error
+            lblError.visibility = View.VISIBLE
+            containerContent.visibility = View.GONE
         }
     }
+
+    override fun onMemberPresenceChanged(user: User) {
+        runOnUiThread {
+            adapter.updatePresence(user)
+        }
+    }
+
+    override fun onPerson(user: User, room: Room) {
+        runOnUiThread {
+            adapter.addPerson(user, room)
+        }
+    }
+
 }

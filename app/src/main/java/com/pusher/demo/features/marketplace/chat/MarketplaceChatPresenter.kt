@@ -22,7 +22,6 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
         fun onMessageReceived(message: Message)
     }
 
-    private val LOG_TAG = "DEMO_APP"
     private lateinit var room: Room
 
     fun connect() {
@@ -96,7 +95,7 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
     }
 
     private fun handleError(error: String) {
-        Log.e(LOG_TAG, error)
+        Log.e(ChatkitManager.LOG_TAG, error)
         view?.onError(error)
     }
 

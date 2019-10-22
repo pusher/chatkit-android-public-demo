@@ -10,6 +10,7 @@ object ChatkitManager {
 
     private val INSTANCE_LOCATOR = "FILL_ME_IN"
     private val TOKEN_PROVIDER_URL = "FILL_ME_IN"
+    val LOG_TAG = "DEMO_APP"
 
     lateinit var chatManager: ChatManager
     lateinit var currentUser: CurrentUser

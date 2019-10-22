@@ -19,12 +19,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/containerTopBar"
-        android:padding="20dp">
+        >
 
         <RelativeLayout
             android:id="@+id/containerProduct"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="20dp"
             >
             <ImageView
                 android:id="@+id/imgProduct"
@@ -54,42 +57,21 @@
             android:layout_height="wrap_content"
             android:text="(1) conversations"
             android:layout_below="@id/containerProduct"
+            android:gravity="center_horizontal"
             android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_marginTop="10dp"
             android:textSize="18sp"
             android:textColor="@color/dark_text"
             />
 
-        <RelativeLayout
-            android:id="@+id/containerConversation"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewPeople"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_below="@id/lblConversationsTitle"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="10dp"
-            >
+            android:layout_marginTop="10dp"/>
 
-            <ImageView
-                android:id="@+id/imgProfile"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/icon_profile_outline"
-                />
-            <TextView
-                android:id="@+id/lblProfile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/imgProfile"
-                android:layout_alignTop="@id/imgProfile"
-                android:layout_alignBottom="@id/imgProfile"
-                android:gravity="center_vertical"
-                android:layout_marginStart="10dp"
-                android:text="Miss Buyer"
-                android:textColor="@color/dark_text"
-                />
-
-        </RelativeLayout>
 
     </RelativeLayout>
 
@@ -100,12 +82,5 @@
         android:layout_centerInParent="true"
         android:textColor="@color/dark_text"
         />
-
-    <TextView
-        android:id="@+id/lblError"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_margin="30dp"/>
 
 </RelativeLayout>
