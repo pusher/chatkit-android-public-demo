@@ -22,6 +22,27 @@ object ChatkitManager {
 
     fun connect(context: Context, userId: String, listener: ChatManagerConnectedListener) {
 
+        //check if we're already connected
+        if (::currentUser.isInitialized){
+            //if we already have a current user let's sign them out first
+            chatManager.close {
+                when (it) {
+                    is Result.Success -> {
+                        connectToChatkit(context, userId, listener)
+                    }
+                    is Result.Failure -> {
+                        listener.onError(it.error.reason)
+                    }
+                }
+            }
+        } else {
+            connectToChatkit(context, userId, listener)
+        }
+
+    }
+
+    private fun connectToChatkit(context: Context, userId: String, listener: ChatManagerConnectedListener) {
+
         //set up your chat manager with your instance locator and token provider
         chatManager = ChatManager(
             instanceLocator = INSTANCE_LOCATOR,
@@ -53,6 +74,5 @@ object ChatkitManager {
                 }
             }
         )
-
     }
 }
