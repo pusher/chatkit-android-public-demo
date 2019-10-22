@@ -1,5 +1,6 @@
 package com.pusher.demo.features.marketplace.seller
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -9,13 +10,14 @@ import com.pusher.chatkit.CurrentUser
 import com.pusher.chatkit.rooms.Room
 import com.pusher.chatkit.users.User
 import com.pusher.demo.R
+import com.pusher.demo.features.marketplace.chat.MarketplaceChatActivity
 import kotlinx.android.synthetic.main.activity_seller.*
 
 class SellerActivity : AppCompatActivity(),
     SellerPresenter.View {
 
     private val presenter = SellerPresenter()
-    private val adapter = PersonAdapter(this)
+    private lateinit var adapter: PersonAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +54,13 @@ class SellerActivity : AppCompatActivity(),
         lblConversationsTitle.text =
             resources.getQuantityText(R.plurals.numberOfPeopleInterested, rooms.size)
 
+        val context = this
         //set up our recyclerview
+        adapter = PersonAdapter(this, object:PersonAdapterListener{
+            override fun onPersonSelected(person: User) {
+                context.startActivity(Intent(context, MarketplaceChatActivity::class.java))
+            }
+        })
         recyclerViewPeople.layoutManager =  LinearLayoutManager(this)
         recyclerViewPeople.adapter = adapter
 

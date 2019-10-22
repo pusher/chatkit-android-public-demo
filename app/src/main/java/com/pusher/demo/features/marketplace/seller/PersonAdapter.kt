@@ -10,7 +10,7 @@ import com.pusher.demo.R
 
 data class Person(val roomId: String, var person: User, var unreadCount: Int)
 
-class PersonAdapter(private val context: Context)
+class PersonAdapter(private val context: Context, val listener: PersonAdapterListener)
     : androidx.recyclerview.widget.RecyclerView.Adapter<PersonViewHolder>() {
 
     private var people = mutableListOf<Person>()
@@ -18,7 +18,7 @@ class PersonAdapter(private val context: Context)
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): PersonViewHolder {
         return PersonViewHolder(
             LayoutInflater.from(parent.context)
-                .inflate(R.layout.row_person, parent, false)
+                .inflate(R.layout.row_person, parent, false), listener
         )
     }
 

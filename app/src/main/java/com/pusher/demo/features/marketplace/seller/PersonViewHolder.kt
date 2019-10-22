@@ -10,7 +10,7 @@ import com.pusher.chatkit.users.User
 import com.pusher.demo.R
 import kotlinx.android.synthetic.main.row_person.view.*
 
-class PersonViewHolder (itemView: View)
+class PersonViewHolder (itemView: View, val listener: PersonAdapterListener)
     : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
     fun bind(user: User, unreadCount: Int, context: Context){
@@ -38,6 +38,10 @@ class PersonViewHolder (itemView: View)
             itemView.lblUnreadCount.text = ":D"
         } else {
             itemView.lblUnreadCount.text = unreadCount.toString()
+        }
+
+        itemView.setOnClickListener {
+            listener.onPersonSelected(user)
         }
 
     }
