@@ -59,6 +59,7 @@ class SellerActivity : AppCompatActivity(),
         adapter = PersonAdapter(this, object:PersonAdapterListener{
             override fun onPersonSelected(person: User) {
                 context.startActivity(Intent(context, MarketplaceChatActivity::class.java))
+                adapter.updateUnreadCountForPerson(person, 0)
             }
         })
         recyclerViewPeople.layoutManager =  LinearLayoutManager(this)
@@ -91,4 +92,9 @@ class SellerActivity : AppCompatActivity(),
         }
     }
 
+    override fun onUnreadCountChanged(room: Room) {
+        runOnUiThread {
+            adapter.updateUnreadCountForRoom(room.id, room.unreadCount!!)
+        }
+    }
 }

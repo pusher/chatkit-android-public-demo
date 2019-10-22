@@ -46,6 +46,24 @@ class PersonAdapter(private val context: Context, val listener: PersonAdapterLis
         }
     }
 
+    fun updateUnreadCountForPerson(person: User, unreadCount: Int) {
+        for (p in people) {
+            if (p.person.id == person.id) {
+                p.unreadCount = unreadCount
+                notifyItemChanged(people.indexOf(p))
+            }
+        }
+    }
+
+    fun updateUnreadCountForRoom(roomId: String, unreadCount: Int) {
+        for (p in people) {
+            if (p.roomId == roomId) {
+                p.unreadCount = unreadCount
+                notifyItemChanged(people.indexOf(p))
+            }
+        }
+    }
+
 
 
 }

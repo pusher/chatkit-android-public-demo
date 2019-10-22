@@ -17,6 +17,7 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
         fun onError(error: String)
         fun onMemberPresenceChanged(user: User)
         fun onPerson(user: User, room: Room)
+        fun onUnreadCountChanged(room: Room)
     }
 
     fun connectToChatkit(context: Context) {
@@ -41,13 +42,15 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
             roomId = room.id ,
             listeners = RoomListeners(
                 onPresenceChange = { person ->
-                    if (isViewAttached() &&
-                        person.id != ChatkitManager.currentUser.id) {
+                    if (person.id != ChatkitManager.currentUser.id) {
                         view?.onMemberPresenceChanged(person)
                     }
+                },
+                onMultipartMessage = {
+                    view?.onUnreadCountChanged(it.room)
                 }
             ),
-            messageLimit = 20,
+            messageLimit = 0,
             callback = { subscription ->
                 //success
                 getMembersForRoom(room)
