@@ -37,6 +37,7 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
             listeners = RoomListeners(
                 onMultipartMessage = { message ->
                     view?.onMessageReceived(message)
+                    updateReadCursor(room.id, message.id)
                 },
                 onPresenceChange = { person ->
                     if (isViewAttached() &&
@@ -92,6 +93,10 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
 
                 }
         })
+    }
+
+    private fun updateReadCursor(roomId: String ,messageId: Int) {
+        ChatkitManager.currentUser.setReadCursor(roomId, messageId)
     }
 
     private fun handleError(error: String) {
