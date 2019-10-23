@@ -1,4 +1,4 @@
-package com.pusher.demo.features.marketplace
+package com.pusher.demo.features.marketplace.chat
 
 import android.os.Bundle
 import android.view.View
@@ -13,47 +13,48 @@ import com.pusher.chatkit.messages.multipart.Message
 import com.pusher.chatkit.presence.Presence
 import com.pusher.chatkit.users.User
 import com.pusher.demo.R
-import kotlinx.android.synthetic.main.activity_seller.*
+import com.pusher.demo.features.marketplace.ChatkitManager
+import kotlinx.android.synthetic.main.activity_marketplace_chat.*
 
-class MarketplaceActivity : AppCompatActivity(), MarketplacePresenter.View {
+class MarketplaceChatActivity : AppCompatActivity(),
+    MarketplaceChatPresenter.View {
 
-    companion object {
-        const val EXTRA_USER_ID = "com.pusher.demo.features.marketplace.EXTRA_USER_ID"
-    }
 
     private lateinit var adapter: MessageAdapter
 
-    private val presenter = MarketplacePresenter()
+    private val presenter = MarketplaceChatPresenter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_seller)
-
-        //get the user id from the intent
-        val userId = intent.getStringExtra(EXTRA_USER_ID)!!
+        setContentView(R.layout.activity_marketplace_chat)
 
         presenter.onViewAttached(this)
 
-        //tell our presenter to connect as the seller user
-        presenter.connect(this, userId)
+        if (ChatkitManager.currentUser != null) {
+            //set up our recyclerview adapter
+            adapter = MessageAdapter(ChatkitManager.currentUser!!.id)
+            val layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+            layoutManager.stackFromEnd = true
+            recyclerViewMessages.layoutManager =  layoutManager
+            recyclerViewMessages.adapter = adapter
 
-        //set up our recyclerview adapter
-        adapter = MessageAdapter(userId)
-        val layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
-        layoutManager.stackFromEnd = true
-        recyclerViewMessages.layoutManager =  layoutManager
-        recyclerViewMessages.adapter = adapter
-
-        //handle sending messages
-        txtMessage.setOnEditorActionListener { _, actionId, _ ->
-            if(actionId == EditorInfo.IME_ACTION_SEND){
-                presenter.sendMessageToRoom(txtMessage.text.toString())
-                txtMessage.setText("")
-                true
-            } else {
-                false
+            //handle sending messages
+            txtMessage.setOnEditorActionListener { _, actionId, _ ->
+                if(actionId == EditorInfo.IME_ACTION_SEND){
+                    presenter.sendMessageToRoom(txtMessage.text.toString())
+                    txtMessage.setText("")
+                    true
+                } else {
+                    false
+                }
             }
+
+            //tell our presenter to connect as the seller user
+            presenter.connect()
+        } else {
+            onError("Current user was not found - have you signed in?")
         }
+
     }
 
     override fun onError(exception: String) {

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+
+    <ImageView
+        android:id="@+id/imgProfile"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/icon_profile_outline"
+        />
+
+    <TextView
+        android:id="@+id/lblUnreadCount"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:textColor="@color/light_text"
+        android:background="@drawable/background_unread_count"
+        android:layout_alignParentEnd="true"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:text="1"
+        />
+
+    <TextView
+        android:id="@+id/lblProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginStart="10dp"
+        android:text="Miss Buyer"
+        android:textColor="@color/dark_text"
+        android:layout_toEndOf="@id/imgProfile"
+        />
+
+</RelativeLayout>

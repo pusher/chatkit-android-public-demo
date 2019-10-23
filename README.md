@@ -20,9 +20,9 @@ Features
 In the dashboard console you need to:
 * create a user `buyer`
 * create a user `seller`
-* create a room `buyer:seller`
+* create a room `buyer:seller` - and add both the `buyer` and `seller` user to the room
 
-Before you run the app you need to supply **your** instance locater in `MarketplacePresenter.kt`
+Before you run the app you need to supply **your** instance locater in `ChatkitManager.kt`
 
 ## Contributions
 
@@ -30,7 +30,6 @@ We have a list of [open issues](https://github.com/pusher/chatkit-android-public
 
 If you'd like to add your own use case section of the app please also update this readme with things a developer will need to do in the dashboard console to get started!
 
-If this is your first time opening a PR and you'd like some support with getting, please reach out by tagging me (@daniellevass) and we can set some time up to get started together 
+If this is your first time opening a PR and you'd like some support with getting, please reach out by tagging me (@daniellevass) and we can set some time up to get started together
 
 Thank you :star:
-

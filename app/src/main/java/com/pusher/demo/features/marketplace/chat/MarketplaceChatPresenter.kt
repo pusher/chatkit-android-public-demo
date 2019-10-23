@@ -1,16 +1,18 @@
-package com.pusher.demo.features.marketplace
+package com.pusher.demo.features.marketplace.chat
 
 import android.content.Context
 import android.util.Log
 import com.pusher.chatkit.*
+import com.pusher.chatkit.CurrentUser
 import com.pusher.chatkit.messages.multipart.Message
 import com.pusher.chatkit.rooms.Room
 import com.pusher.chatkit.rooms.RoomListeners
 import com.pusher.chatkit.users.User
 import com.pusher.demo.features.BasePresenter
+import com.pusher.demo.features.marketplace.ChatkitManager
 import com.pusher.util.Result
 
-class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
+class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>(){
 
     interface View {
         fun onError(exception: String)
@@ -20,74 +22,31 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
         fun onMessageReceived(message: Message)
     }
 
-    private val LOG_TAG = "DEMO_APP"
-    private val INSTANCE_LOCATOR = "FILL_ME_IN"
-    private val TOKEN_PROVIDER_URL = "FILL_ME_IN"
-
-    private lateinit var chatManager: ChatManager
-    private lateinit var currentUser: CurrentUser
-
     private lateinit var room: Room
 
-    fun connect(context: Context, userId: String) {
-
-        //set up your chat manager with your instance locator and token provider
-        chatManager = ChatManager(
-            instanceLocator = INSTANCE_LOCATOR,
-            userId = userId,
-            dependencies = AndroidChatkitDependencies(
-                tokenProvider = ChatkitTokenProvider(
-                    endpoint = TOKEN_PROVIDER_URL,
-                    userId = userId
-                ),
-                context = context
-            )
-        )
-
-        //connect to chatkit
-        chatManager.connect(
-            listeners = ChatListeners(),
-            callback = { result ->
-                when (result) {
-
-                    is Result.Success -> {
-                        result.value.let { user ->
-                            currentUser = user
-                            view?.onConnected(user)
-                            subscribeToRoom()
-                        }
-                    }
-
-                    is Result.Failure -> {
-                        handleError(result.error.reason)
-                    }
-                }
-
-            }
-        )
-
+    fun connect() {
+        subscribeToRoom()
     }
 
     private fun subscribeToRoom() {
-
-        val usersRoom =  currentUser.rooms.find { room -> room.name == "buyer:seller" }
-
-        if (usersRoom == null) {
-            handleError("Could not subscribe to buyer:seller room - have you created the sample data?")
+        if (ChatkitManager.currentUser == null) {
+            handleError("Current user was not found - have you signed in?")
             return
         }
 
-        room = usersRoom
+        room = ChatkitManager.currentUser!!.rooms.find { room -> room.name == "buyer:seller" }!!
 
         //subscribe to the room
-        currentUser.subscribeToRoomMultipart(
+        ChatkitManager.currentUser!!.subscribeToRoomMultipart(
             roomId = room.id ,
             listeners = RoomListeners(
                 onMultipartMessage = { message ->
                     view?.onMessageReceived(message)
+                    updateReadCursor(room.id, message.id)
                 },
                 onPresenceChange = { person ->
-                    if (person.id != currentUser.id) {
+                    if (isViewAttached() &&
+                            person.id != ChatkitManager.currentUser!!.id) {
                         view?.onMemberPresenceChanged(person)
                     }
                 }
@@ -102,13 +61,12 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
 
     private fun getMembersForRoom(room: Room){
         //get members for room
-        currentUser.usersForRoom( room.id, callback = { result ->
+        ChatkitManager.currentUser!!.usersForRoom( room.id, callback = { result ->
             when (result) {
-
                 is Result.Success -> {
                     result.value.let { members ->
                         //check we actually have another user to talk to
-                        val otherMember = members.find { user-> user.id != currentUser.id }
+                        val otherMember = members.find { user-> user.id != ChatkitManager.currentUser!!.id }
                         if (otherMember == null) {
                             handleError("could not find the other user to talk to - " +
                                     "have you created the sample data?")
@@ -128,7 +86,7 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
 
     fun sendMessageToRoom(message: String) {
 
-        currentUser.sendSimpleMessage(room, message,
+        ChatkitManager.currentUser!!.sendSimpleMessage(room, message,
             callback = { result ->
                 when (result) {
 
@@ -142,8 +100,12 @@ class MarketplacePresenter :  BasePresenter<MarketplacePresenter.View>(){
         })
     }
 
+    private fun updateReadCursor(roomId: String ,messageId: Int) {
+        ChatkitManager.currentUser!!.setReadCursor(roomId, messageId)
+    }
+
     private fun handleError(error: String) {
-        Log.e(LOG_TAG, error)
+        Log.e(ChatkitManager.LOG_TAG, error)
         view?.onError(error)
     }
 
