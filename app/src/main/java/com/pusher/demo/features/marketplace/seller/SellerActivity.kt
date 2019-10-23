@@ -94,7 +94,11 @@ class SellerActivity : AppCompatActivity(),
 
     override fun onUnreadCountChanged(room: Room) {
         runOnUiThread {
-            adapter.updateUnreadCountForRoom(room.id, room.unreadCount!!)
+            var unreadCount = room.unreadCount
+            if (unreadCount == null) {
+                unreadCount = 0
+            }
+            adapter.updateUnreadCountForRoom(room.id, unreadCount)
         }
     }
 }

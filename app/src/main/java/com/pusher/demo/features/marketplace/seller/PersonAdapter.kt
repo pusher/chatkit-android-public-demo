@@ -32,8 +32,13 @@ class PersonAdapter(private val context: Context, val listener: PersonAdapterLis
     }
 
     fun addPerson(person: User, room: Room) {
-        //todo: how do we fix this ->
-        people.add(Person(room.id, person, room.unreadCount!!))
+
+        var unreadCount = room.unreadCount
+        if (unreadCount == null) {
+            unreadCount = 0
+        }
+
+        people.add(Person(room.id, person, unreadCount))
         notifyItemInserted(people.size)
     }
 
