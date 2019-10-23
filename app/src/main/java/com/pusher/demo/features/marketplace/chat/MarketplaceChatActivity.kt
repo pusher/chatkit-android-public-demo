@@ -30,26 +30,31 @@ class MarketplaceChatActivity : AppCompatActivity(),
 
         presenter.onViewAttached(this)
 
-        //tell our presenter to connect as the seller user
-        presenter.connect()
+        if (ChatkitManager.currentUser != null) {
+            //set up our recyclerview adapter
+            adapter = MessageAdapter(ChatkitManager.currentUser!!.id)
+            val layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+            layoutManager.stackFromEnd = true
+            recyclerViewMessages.layoutManager =  layoutManager
+            recyclerViewMessages.adapter = adapter
 
-        //set up our recyclerview adapter
-        adapter = MessageAdapter(ChatkitManager.currentUser.id)
-        val layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
-        layoutManager.stackFromEnd = true
-        recyclerViewMessages.layoutManager =  layoutManager
-        recyclerViewMessages.adapter = adapter
-
-        //handle sending messages
-        txtMessage.setOnEditorActionListener { _, actionId, _ ->
-            if(actionId == EditorInfo.IME_ACTION_SEND){
-                presenter.sendMessageToRoom(txtMessage.text.toString())
-                txtMessage.setText("")
-                true
-            } else {
-                false
+            //handle sending messages
+            txtMessage.setOnEditorActionListener { _, actionId, _ ->
+                if(actionId == EditorInfo.IME_ACTION_SEND){
+                    presenter.sendMessageToRoom(txtMessage.text.toString())
+                    txtMessage.setText("")
+                    true
+                } else {
+                    false
+                }
             }
+
+            //tell our presenter to connect as the seller user
+            presenter.connect()
+        } else {
+            onError("Current user was not found - have you signed in?")
         }
+
     }
 
     override fun onError(exception: String) {

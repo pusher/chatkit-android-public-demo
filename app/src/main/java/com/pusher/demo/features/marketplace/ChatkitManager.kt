@@ -12,8 +12,8 @@ object ChatkitManager {
     private val TOKEN_PROVIDER_URL = "FILL_ME_IN"
     val LOG_TAG = "DEMO_APP"
 
-    lateinit var chatManager: ChatManager
-    lateinit var currentUser: CurrentUser
+    private lateinit var chatManager: ChatManager
+    var currentUser: CurrentUser? = null
 
     interface ChatManagerConnectedListener{
         fun onConnected(user: CurrentUser)
@@ -23,7 +23,7 @@ object ChatkitManager {
     fun connect(context: Context, userId: String, listener: ChatManagerConnectedListener) {
 
         //check if we're already connected
-        if (::currentUser.isInitialized){
+        if (currentUser != null){
             //if we already have a current user let's sign them out first
             chatManager.close {
                 when (it) {

@@ -37,12 +37,19 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
     }
 
     fun subscribeToRoom(room: Room) {
+
+        if (ChatkitManager.currentUser == null) {
+            view?.onError("Current user was not found - have you signed in?")
+            Log.e(ChatkitManager.LOG_TAG, "Current user was not found - have you signed in?")
+            return
+        }
+
         //subscribe to the room
-        ChatkitManager.currentUser.subscribeToRoomMultipart(
+        ChatkitManager.currentUser!!.subscribeToRoomMultipart(
             roomId = room.id ,
             listeners = RoomListeners(
                 onPresenceChange = { person ->
-                    if (person.id != ChatkitManager.currentUser.id) {
+                    if (person.id != ChatkitManager.currentUser!!.id) {
                         view?.onMemberPresenceChanged(person)
                     }
                 },
@@ -60,12 +67,12 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
 
     private fun getMembersForRoom(room: Room){
         //get members for room
-        ChatkitManager.currentUser.usersForRoom( room.id, callback = { result ->
+        ChatkitManager.currentUser!!.usersForRoom( room.id, callback = { result ->
             when (result) {
                 is Result.Success -> {
                     result.value.let { members ->
                         //check we actually have another user to talk to
-                        val otherMember = members.find { user-> user.id != ChatkitManager.currentUser.id }
+                        val otherMember = members.find { user-> user.id != ChatkitManager.currentUser!!.id }
                         if (otherMember == null) {
                             val error = "Couldn't find any other people in room " + room.name
                             Log.e(ChatkitManager.LOG_TAG, error)

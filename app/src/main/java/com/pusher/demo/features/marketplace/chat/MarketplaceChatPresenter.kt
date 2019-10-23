@@ -29,10 +29,15 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
     }
 
     private fun subscribeToRoom() {
-        room = ChatkitManager.currentUser.rooms.find { room -> room.name == "buyer:seller" }!!
+        if (ChatkitManager.currentUser == null) {
+            handleError("Current user was not found - have you signed in?")
+            return
+        }
+
+        room = ChatkitManager.currentUser!!.rooms.find { room -> room.name == "buyer:seller" }!!
 
         //subscribe to the room
-        ChatkitManager.currentUser.subscribeToRoomMultipart(
+        ChatkitManager.currentUser!!.subscribeToRoomMultipart(
             roomId = room.id ,
             listeners = RoomListeners(
                 onMultipartMessage = { message ->
@@ -41,7 +46,7 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
                 },
                 onPresenceChange = { person ->
                     if (isViewAttached() &&
-                            person.id != ChatkitManager.currentUser.id) {
+                            person.id != ChatkitManager.currentUser!!.id) {
                         view?.onMemberPresenceChanged(person)
                     }
                 }
@@ -56,12 +61,12 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
 
     private fun getMembersForRoom(room: Room){
         //get members for room
-        ChatkitManager.currentUser.usersForRoom( room.id, callback = { result ->
+        ChatkitManager.currentUser!!.usersForRoom( room.id, callback = { result ->
             when (result) {
                 is Result.Success -> {
                     result.value.let { members ->
                         //check we actually have another user to talk to
-                        val otherMember = members.find { user-> user.id != ChatkitManager.currentUser.id }
+                        val otherMember = members.find { user-> user.id != ChatkitManager.currentUser!!.id }
                         if (otherMember == null) {
                             handleError("could not find the other user to talk to - " +
                                     "have you created the sample data?")
@@ -81,7 +86,7 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
 
     fun sendMessageToRoom(message: String) {
 
-        ChatkitManager.currentUser.sendSimpleMessage(room, message,
+        ChatkitManager.currentUser!!.sendSimpleMessage(room, message,
             callback = { result ->
                 when (result) {
 
@@ -96,7 +101,7 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
     }
 
     private fun updateReadCursor(roomId: String ,messageId: Int) {
-        ChatkitManager.currentUser.setReadCursor(roomId, messageId)
+        ChatkitManager.currentUser!!.setReadCursor(roomId, messageId)
     }
 
     private fun handleError(error: String) {
