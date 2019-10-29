@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lblQuickReply"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:layout_alignParentEnd="true"
+    android:background="@drawable/message_bubble_quick_reply"
+    android:gravity="center"
+    android:textColor="@color/light_text"
+    android:textSize="14sp"
+    android:layout_marginTop="5dp"
+    android:layout_marginStart="10dp"
+    android:layout_marginBottom="5dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"/>

@@ -3,6 +3,7 @@ package com.pusher.demo.features.marketplace.chat
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
@@ -55,6 +56,16 @@ class MarketplaceChatActivity : AppCompatActivity(),
             onError("Current user was not found - have you signed in?")
         }
 
+        if (ChatkitManager.currentUser!!.name == "buyer") {
+            addQuickReplies(listOf(
+                "is this item still available?",
+                "is the price negotiable?"
+            ))
+        } else if (ChatkitManager.currentUser!!.name == "seller") {
+            addQuickReplies(listOf(
+                "this item is still available",
+                "sorry this item is taken"))
+        }
     }
 
     override fun onError(exception: String) {
@@ -110,4 +121,19 @@ class MarketplaceChatActivity : AppCompatActivity(),
         }
     }
 
+    private fun addQuickReplies(quickReplies: List<String>) {
+
+        for (quickReply in quickReplies) {
+
+            val item = layoutInflater.inflate(R.layout.item_quick_reply, containerQuickReplies, false)
+            item.findViewById<TextView>(R.id.lblQuickReply).text = quickReply
+
+            containerQuickReplies.addView(item)
+
+            item.setOnClickListener {
+                presenter.sendMessageToRoom(quickReply)
+            }
+
+        }
+    }
 }

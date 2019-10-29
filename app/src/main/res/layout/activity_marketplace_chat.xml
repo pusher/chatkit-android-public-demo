@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".features.marketplace.chat.MarketplaceChatActivity">
+    tools:context=".features.marketplace.chat.MarketplaceChatActivity"
+    android:background="@color/light_text">
 
     <!-- top bar-->
     <RelativeLayout
@@ -45,14 +46,27 @@
     </RelativeLayout>
 
     <!-- bottom bar-->
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/containerBottomBar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/light_orange"
+        android:layout_height="wrap_content"
+        android:background="#fff"
         android:layout_alignParentBottom="true"
+        android:orientation="vertical"
         android:elevation="5dp"
         >
+
+        <ScrollView
+            android:id="@+id/scrollQuickReplies"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/containerQuickReplies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"/>
+        </ScrollView>
+
         <EditText
             android:id="@+id/txtMessage"
             android:layout_width="match_parent"
@@ -62,7 +76,7 @@
             android:layout_marginEnd="10dp"
             android:singleLine="true"
             android:imeOptions="actionSend"/>
-    </FrameLayout>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewMessages"
