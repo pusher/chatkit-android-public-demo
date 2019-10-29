@@ -3,7 +3,8 @@
 This is a working demo app for the following use cases of Chatkit:
 * Marketplace - with a buyer and seller user
 
-![giphy](https://media.giphy.com/media/YRu7AZMm8Q2Qxk2mRr/giphy.gif)
+![buyer journey](https://media.giphy.com/media/cnv6LzNPTYl18ESudS/giphy.gif)
+![seller journey](https://media.giphy.com/media/KD1A0b1HoCdVix12hC/giphy.gif)
 
 ## Getting Started
 
