@@ -58,13 +58,14 @@ class MarketplaceChatActivity : AppCompatActivity(),
 
         if (ChatkitManager.currentUser!!.name == "buyer") {
             addQuickReplies(listOf(
-                "is this item still available?",
-                "is the price negotiable?"
+                "Is this item still available?",
+                "Is the price negotiable?",
+                "Are you willing to lower the price?"
             ))
         } else if (ChatkitManager.currentUser!!.name == "seller") {
             addQuickReplies(listOf(
-                "this item is still available",
-                "sorry this item is taken"))
+                "This item is still available",
+                "Sorry this item is no longer available"))
         }
     }
 
