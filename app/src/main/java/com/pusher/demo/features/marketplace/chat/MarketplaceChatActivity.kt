@@ -1,6 +1,7 @@
 package com.pusher.demo.features.marketplace.chat
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
@@ -14,13 +15,17 @@ import com.pusher.chatkit.presence.Presence
 import com.pusher.chatkit.users.User
 import com.pusher.demo.R
 import com.pusher.demo.features.marketplace.ChatkitManager
+import com.pusher.demo.features.marketplace.chat.MessageAdapter.MessageDisplayedListener
 import kotlinx.android.synthetic.main.activity_marketplace_chat.*
 
-class MarketplaceChatActivity : AppCompatActivity(),
-    MarketplaceChatPresenter.View {
-
+class MarketplaceChatActivity : AppCompatActivity(), MarketplaceChatPresenter.View {
 
     private lateinit var adapter: MessageAdapter
+    private val messageDisplayedListener = object : MessageDisplayedListener {
+        override fun onMessageDisplayed(message: Message) {
+            presenter.onMessageDisplayed(message)
+        }
+    }
 
     private val presenter = MarketplaceChatPresenter()
 
@@ -32,15 +37,19 @@ class MarketplaceChatActivity : AppCompatActivity(),
 
         if (ChatkitManager.currentUser != null) {
             //set up our recyclerview adapter
-            adapter = MessageAdapter(ChatkitManager.currentUser!!.id)
+            adapter = MessageAdapter(ChatkitManager.currentUser!!.id, messageDisplayedListener)
             val layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
             layoutManager.stackFromEnd = true
             recyclerViewMessages.layoutManager =  layoutManager
             recyclerViewMessages.adapter = adapter
 
             //handle sending messages
-            txtMessage.setOnEditorActionListener { _, actionId, _ ->
-                if(actionId == EditorInfo.IME_ACTION_SEND){
+            txtMessage.setOnEditorActionListener { _, actionId, keyEvent ->
+
+                val sendRequested = actionId == EditorInfo.IME_ACTION_SEND ||
+                        keyEvent.keyCode == KeyEvent.KEYCODE_ENTER
+
+                if (sendRequested && txtMessage.text.isNotEmpty()){
                     presenter.sendMessageToRoom(txtMessage.text.toString())
                     txtMessage.setText("")
                     true
@@ -97,7 +106,7 @@ class MarketplaceChatActivity : AppCompatActivity(),
 
     }
 
-    override fun onMemberPresenceChanged(person: User) {
+    override fun onOtherMemberPresenceChanged(person: User) {
         runOnUiThread {
             displayPresence(person.presence)
         }
@@ -106,7 +115,13 @@ class MarketplaceChatActivity : AppCompatActivity(),
     override fun onMessageReceived(message: Message) {
         runOnUiThread {
             adapter.addMessage(message)
-            recyclerViewMessages.layoutManager?.scrollToPosition(adapter.messages.size -1)
+            recyclerViewMessages.layoutManager?.scrollToPosition(adapter.itemCount - 1)
+        }
+    }
+
+    override fun onOtherMemberReadCursorChanged(messageId: Int) {
+        runOnUiThread {
+            adapter.markAsReadUpTo(messageId)
         }
     }
 
