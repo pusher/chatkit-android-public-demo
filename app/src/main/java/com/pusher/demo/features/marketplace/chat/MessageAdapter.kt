@@ -6,12 +6,8 @@ import com.pusher.chatkit.messages.multipart.Message
 import com.pusher.demo.R
 
 class MessageAdapter(private val currentUserId: String,
-                     private val messageDisplayedListener : MessageDisplayedListener)
+                     private val messageDisplayedListener : (message: Message) -> Unit)
     : androidx.recyclerview.widget.RecyclerView.Adapter<MessageViewHolder>() {
-
-    interface MessageDisplayedListener {
-        fun onMessageDisplayed(message: Message)
-    }
 
     private var messages = mutableListOf<Message>()
 
@@ -36,7 +32,7 @@ class MessageAdapter(private val currentUserId: String,
         val read = message.id <= lastReadByOtherMemberMessageId
         holder.markAsRead(isCurrentUserMessage && read)
 
-        messageDisplayedListener.onMessageDisplayed(message)
+        messageDisplayedListener(message)
     }
 
     fun addMessage(message: Message) {

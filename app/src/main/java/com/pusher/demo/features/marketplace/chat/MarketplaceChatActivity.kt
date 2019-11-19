@@ -15,17 +15,11 @@ import com.pusher.chatkit.presence.Presence
 import com.pusher.chatkit.users.User
 import com.pusher.demo.R
 import com.pusher.demo.features.marketplace.ChatkitManager
-import com.pusher.demo.features.marketplace.chat.MessageAdapter.MessageDisplayedListener
 import kotlinx.android.synthetic.main.activity_marketplace_chat.*
 
 class MarketplaceChatActivity : AppCompatActivity(), MarketplaceChatPresenter.View {
 
     private lateinit var adapter: MessageAdapter
-    private val messageDisplayedListener = object : MessageDisplayedListener {
-        override fun onMessageDisplayed(message: Message) {
-            presenter.onMessageDisplayed(message)
-        }
-    }
 
     private val presenter = MarketplaceChatPresenter()
 
@@ -37,7 +31,10 @@ class MarketplaceChatActivity : AppCompatActivity(), MarketplaceChatPresenter.Vi
 
         if (ChatkitManager.currentUser != null) {
             //set up our recyclerview adapter
-            adapter = MessageAdapter(ChatkitManager.currentUser!!.id, messageDisplayedListener)
+            adapter = MessageAdapter(ChatkitManager.currentUser!!.id) {
+                presenter.onMessageDisplayed(it)
+            }
+
             val layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
             layoutManager.stackFromEnd = true
             recyclerViewMessages.layoutManager =  layoutManager
