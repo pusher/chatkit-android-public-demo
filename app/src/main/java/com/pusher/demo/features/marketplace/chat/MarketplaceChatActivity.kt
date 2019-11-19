@@ -58,7 +58,6 @@ class MarketplaceChatActivity : AppCompatActivity(), MarketplaceChatPresenter.Vi
                 }
             }
 
-            //tell our presenter to connect as the seller user
             presenter.connect()
         } else {
             onError("Current user was not found - have you signed in?")
