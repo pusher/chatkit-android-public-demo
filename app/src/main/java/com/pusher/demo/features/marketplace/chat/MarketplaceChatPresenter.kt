@@ -48,23 +48,29 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
             roomId = room.id ,
             listeners = RoomListeners(
                 onMultipartMessage = { message ->
-                    view?.onMessageReceived(message)
+                    runOnInitThread {
+                        view?.onMessageReceived(message)
+                    }
                 },
                 onPresenceChange = { person ->
-                    if (person.id != currentUser().id) {
-                        view?.onOtherMemberPresenceChanged(person)
+                    runOnInitThread {
+                        if (person.id != currentUser().id) {
+                            view?.onOtherMemberPresenceChanged(person)
+                        }
                     }
                 },
                 onNewReadCursor = { cursor ->
-                    if (cursor.userId != currentUser().id) {
-                        view?.onOtherMemberReadCursorChanged(cursor.position)
+                    runOnInitThread {
+                        if (cursor.userId != currentUser().id) {
+                            view?.onOtherMemberReadCursorChanged(cursor.position)
+                        }
                     }
                 }
             ),
             messageLimit = 20,
             callback = { subscription ->
                 //success
-                handler.post {
+                runOnInitThread {
                     getCurrentUserReadCursor(room)
                     getOtherMemberInfo(room)
                 }
@@ -75,25 +81,29 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
     private fun getOtherMemberInfo(room: Room){
         //get members for room
         currentUser().usersForRoom( room.id, callback = { result ->
-            when (result) {
-                is Result.Success -> {
-                    result.value.let { members ->
-                        //check we actually have another user to talk to
-                        val otherMember = members.find { user-> user.id != currentUser().id }
-                        if (otherMember == null) {
-                            handleError("could not find the other user to talk to - " +
-                                    "have you created the sample data?")
-                        } else {
-                            getOtherMemberReadCursor(room, otherMember)
-                            view?.onOtherMember(otherMember)
+            runOnInitThread {
+                when (result) {
+                    is Result.Success -> {
+                        result.value.let { members ->
+                            //check we actually have another user to talk to
+                            val otherMember = members.find { user -> user.id != currentUser().id }
+                            if (otherMember == null) {
+                                handleError(
+                                    "could not find the other user to talk to - " +
+                                            "have you created the sample data?"
+                                )
+                            } else {
+                                getOtherMemberReadCursor(room, otherMember)
+                                view?.onOtherMember(otherMember)
+                            }
                         }
                     }
-                }
 
-                is Result.Failure -> {
-                    handleError(result.error.reason)
-                }
+                    is Result.Failure -> {
+                        handleError(result.error.reason)
+                    }
 
+                }
             }
         })
     }
@@ -120,14 +130,16 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
     fun sendMessageToRoom(message: String) {
         currentUser().sendSimpleMessage(room, message,
             callback = { result ->
-                when (result) {
+                runOnInitThread {
+                    when (result) {
 
-                    //we handle the success automatically by display the message
+                        //we handle the success automatically by display the message
 
-                    is Result.Failure -> {
-                        handleError(result.error.reason)
+                        is Result.Failure -> {
+                            handleError(result.error.reason)
+                        }
+
                     }
-
                 }
         })
     }
@@ -140,6 +152,8 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
         Log.e(ChatkitManager.LOG_TAG, error)
         view?.onError(error)
     }
+
+    private fun runOnInitThread(runnable: () -> Unit) = handler.post(runnable)
 
 }
 

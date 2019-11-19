@@ -66,18 +66,13 @@ class MarketplaceChatActivity : AppCompatActivity(), MarketplaceChatPresenter.Vi
     }
 
     override fun onError(exception: String) {
-        runOnUiThread {
-            txtMessage.isEnabled = false
-            lblError.text = exception
-            recyclerViewMessages.visibility = View.GONE
-        }
-
+        txtMessage.isEnabled = false
+        lblError.text = exception
+        recyclerViewMessages.visibility = View.GONE
     }
 
     override fun onConnected(person: CurrentUser) {
-        runOnUiThread {
-            Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show()
-        }
+        Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show()
     }
 
     private fun displayPresence(presence: Presence) {
@@ -88,7 +83,6 @@ class MarketplaceChatActivity : AppCompatActivity(), MarketplaceChatPresenter.Vi
 
             imgStatus.setImageDrawable(wrappedDrawable)
         } else {
-
             val unwrappedDrawable = AppCompatResources.getDrawable(applicationContext, R.drawable.icon_profile_outline)
             val wrappedDrawable = DrawableCompat.wrap(unwrappedDrawable!!)
             DrawableCompat.setTint(wrappedDrawable, ContextCompat.getColor(applicationContext, R.color.light_purple))
@@ -98,30 +92,21 @@ class MarketplaceChatActivity : AppCompatActivity(), MarketplaceChatPresenter.Vi
     }
 
     override fun onOtherMember(person: User) {
-        runOnUiThread {
-            lblName.text = person.name
-            displayPresence(person.presence)
-        }
-
+        lblName.text = person.name
+        displayPresence(person.presence)
     }
 
     override fun onOtherMemberPresenceChanged(person: User) {
-        runOnUiThread {
-            displayPresence(person.presence)
-        }
+        displayPresence(person.presence)
     }
 
     override fun onMessageReceived(message: Message) {
-        runOnUiThread {
-            adapter.addMessage(message)
-            recyclerViewMessages.layoutManager?.scrollToPosition(adapter.itemCount - 1)
-        }
+        adapter.addMessage(message)
+        recyclerViewMessages.layoutManager?.scrollToPosition(adapter.itemCount - 1)
     }
 
     override fun onOtherMemberReadCursorChanged(messageId: Int) {
-        runOnUiThread {
-            adapter.markAsReadUpTo(messageId)
-        }
+        adapter.markAsReadUpTo(messageId)
     }
 
 }
