@@ -28,9 +28,9 @@ class MessageAdapter(private val currentUserId: String,
         val message = messages[position]
         holder.bind(message, currentUserId)
 
-        val isCurrentUserMessage = message.sender.id == currentUserId
+        val currentUserMessage = message.sender.id == currentUserId
         val read = message.id <= lastReadByOtherMemberMessageId
-        holder.markAsRead(isCurrentUserMessage && read)
+        holder.markAsRead(currentUserMessage && read)
 
         messageDisplayedListener(message)
     }
