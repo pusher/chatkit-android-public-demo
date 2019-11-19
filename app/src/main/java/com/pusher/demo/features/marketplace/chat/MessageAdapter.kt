@@ -6,7 +6,7 @@ import com.pusher.chatkit.messages.multipart.Message
 import com.pusher.demo.R
 
 class MessageAdapter(private val currentUserId: String,
-                     private val messageDisplayedListener : (message: Message) -> Unit)
+                     private val messageDisplayedListener : (Message) -> Unit)
     : androidx.recyclerview.widget.RecyclerView.Adapter<MessageViewHolder>() {
 
     private var messages = mutableListOf<Message>()
