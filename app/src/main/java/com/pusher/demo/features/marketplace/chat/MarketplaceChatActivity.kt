@@ -1,6 +1,7 @@
 package com.pusher.demo.features.marketplace.chat
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
@@ -16,9 +17,7 @@ import com.pusher.demo.R
 import com.pusher.demo.features.marketplace.ChatkitManager
 import kotlinx.android.synthetic.main.activity_marketplace_chat.*
 
-class MarketplaceChatActivity : AppCompatActivity(),
-    MarketplaceChatPresenter.View {
-
+class MarketplaceChatActivity : AppCompatActivity(), MarketplaceChatPresenter.View {
 
     private lateinit var adapter: MessageAdapter
 
@@ -32,15 +31,22 @@ class MarketplaceChatActivity : AppCompatActivity(),
 
         if (ChatkitManager.currentUser != null) {
             //set up our recyclerview adapter
-            adapter = MessageAdapter(ChatkitManager.currentUser!!.id)
+            adapter = MessageAdapter(ChatkitManager.currentUser!!.id) {
+                presenter.onMessageDisplayed(it)
+            }
+
             val layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
             layoutManager.stackFromEnd = true
             recyclerViewMessages.layoutManager =  layoutManager
             recyclerViewMessages.adapter = adapter
 
             //handle sending messages
-            txtMessage.setOnEditorActionListener { _, actionId, _ ->
-                if(actionId == EditorInfo.IME_ACTION_SEND){
+            txtMessage.setOnEditorActionListener { _, actionId, keyEvent ->
+
+                val sendRequested = actionId == EditorInfo.IME_ACTION_SEND ||
+                        keyEvent.keyCode == KeyEvent.KEYCODE_ENTER
+
+                if (sendRequested && txtMessage.text.isNotEmpty()){
                     presenter.sendMessageToRoom(txtMessage.text.toString())
                     txtMessage.setText("")
                     true
@@ -49,7 +55,6 @@ class MarketplaceChatActivity : AppCompatActivity(),
                 }
             }
 
-            //tell our presenter to connect as the seller user
             presenter.connect()
         } else {
             onError("Current user was not found - have you signed in?")
@@ -58,18 +63,13 @@ class MarketplaceChatActivity : AppCompatActivity(),
     }
 
     override fun onError(exception: String) {
-        runOnUiThread {
-            txtMessage.isEnabled = false
-            lblError.text = exception
-            recyclerViewMessages.visibility = View.GONE
-        }
-
+        txtMessage.isEnabled = false
+        lblError.text = exception
+        recyclerViewMessages.visibility = View.GONE
     }
 
     override fun onConnected(person: CurrentUser) {
-        runOnUiThread {
-            Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show()
-        }
+        Toast.makeText(this, "connected", Toast.LENGTH_SHORT).show()
     }
 
     private fun displayPresence(presence: Presence) {
@@ -80,7 +80,6 @@ class MarketplaceChatActivity : AppCompatActivity(),
 
             imgStatus.setImageDrawable(wrappedDrawable)
         } else {
-
             val unwrappedDrawable = AppCompatResources.getDrawable(applicationContext, R.drawable.icon_profile_outline)
             val wrappedDrawable = DrawableCompat.wrap(unwrappedDrawable!!)
             DrawableCompat.setTint(wrappedDrawable, ContextCompat.getColor(applicationContext, R.color.light_purple))
@@ -90,24 +89,21 @@ class MarketplaceChatActivity : AppCompatActivity(),
     }
 
     override fun onOtherMember(person: User) {
-        runOnUiThread {
-            lblName.text = person.name
-            displayPresence(person.presence)
-        }
-
+        lblName.text = person.name
+        displayPresence(person.presence)
     }
 
-    override fun onMemberPresenceChanged(person: User) {
-        runOnUiThread {
-            displayPresence(person.presence)
-        }
+    override fun onOtherMemberPresenceChanged(person: User) {
+        displayPresence(person.presence)
     }
 
     override fun onMessageReceived(message: Message) {
-        runOnUiThread {
-            adapter.addMessage(message)
-            recyclerViewMessages.layoutManager?.scrollToPosition(adapter.messages.size -1)
-        }
+        adapter.addMessage(message)
+        recyclerViewMessages.layoutManager?.scrollToPosition(adapter.itemCount - 1)
+    }
+
+    override fun onOtherMemberReadCursorChanged(messageId: Int) {
+        adapter.markAsReadUpTo(messageId)
     }
 
 }
