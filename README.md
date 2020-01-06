@@ -21,7 +21,8 @@ Features
 In the dashboard console you need to:
 * create a user `buyer`
 * create a user `seller`
-* create a room `buyer:seller` - and add both the `buyer` and `seller` user to the room
+* create a room `buyer:seller`
+* add both the `buyer` **and** `seller` user to the room
 
 Before you run the app you need to supply **your** instance locater in `ChatkitManager.kt`
 
