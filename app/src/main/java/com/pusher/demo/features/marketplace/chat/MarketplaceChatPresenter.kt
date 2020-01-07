@@ -109,13 +109,32 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
     }
 
     private fun getOtherMemberReadCursor(room: Room, otherMember : User) {
-        val readCursor = currentUser().getReadCursor(room, otherMember).successOrThrow()
-        view?.onOtherMemberReadCursorChanged(readCursor.position)
+        currentUser().getReadCursor(room, otherMember).fold(
+            onFailure = {
+                // this situation can happen when the room has just been created, and the other
+                // persons cursor has not yet been created as they have not yet read any messages.
+                Log.d(ChatkitManager.LOG_TAG, "failed to create the other members cursor")
+            },
+            onSuccess = {
+                view?.onOtherMemberReadCursorChanged(it.position)
+            })
+    }
+
+    private fun updateCurrentUserMessageId(messageId: Int) {
+        lastReadByCurrentUserMessageId = messageId
     }
 
     private fun getCurrentUserReadCursor(room: Room) {
-        val readCursor = currentUser().getReadCursor(room).successOrThrow()
-        lastReadByCurrentUserMessageId = readCursor.position
+        currentUser().getReadCursor(room).fold(
+            onFailure = {
+                // this situation can happen when the room has just been created, and your current
+                // users cursor has not yet been created as they have not yet read any messages.
+                Log.d(ChatkitManager.LOG_TAG, "failed to create the other members cursor")
+            },
+            onSuccess = {
+                updateCurrentUserMessageId(it.position)
+            }
+        )
     }
 
     fun onMessageDisplayed(message: Message) {
