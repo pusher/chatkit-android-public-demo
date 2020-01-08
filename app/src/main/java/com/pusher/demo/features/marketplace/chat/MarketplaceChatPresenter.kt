@@ -13,6 +13,8 @@ import com.pusher.util.Result
 
 class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>(){
 
+    val LOG_TAG = "DEMO_APP"
+
     interface View {
         fun onConnected(person: CurrentUser)
 
@@ -109,13 +111,29 @@ class MarketplaceChatPresenter :  BasePresenter<MarketplaceChatPresenter.View>()
     }
 
     private fun getOtherMemberReadCursor(room: Room, otherMember : User) {
-        val readCursor = currentUser().getReadCursor(room, otherMember).successOrThrow()
-        view?.onOtherMemberReadCursorChanged(readCursor.position)
+        currentUser().getReadCursor(room, otherMember).fold(
+            onSuccess = {
+                view?.onOtherMemberReadCursorChanged(it.position)
+            },
+            onFailure = {
+                // this situation can happen when the room has just been created, and the other
+                // persons cursor has not yet been created as they have not yet read any messages.
+                Log.d(LOG_TAG, "other member's cursor not set yet")
+            }
+        )
     }
 
     private fun getCurrentUserReadCursor(room: Room) {
-        val readCursor = currentUser().getReadCursor(room).successOrThrow()
-        lastReadByCurrentUserMessageId = readCursor.position
+        currentUser().getReadCursor(room).fold(
+            onSuccess = {
+                lastReadByCurrentUserMessageId = it.position
+            },
+            onFailure = {
+                // this situation can happen when the room has just been created, and your current
+                // users cursor has not yet been created as they have not yet read any messages.
+                Log.d(LOG_TAG, "current member's cursor not set yet")
+            }
+        )
     }
 
     fun onMessageDisplayed(message: Message) {
