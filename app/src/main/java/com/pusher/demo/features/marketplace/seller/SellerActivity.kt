@@ -52,7 +52,8 @@ class SellerActivity : AppCompatActivity(),
         // because we only have 1 product we can assume all conversations are to dow ith it!
 
         lblConversationsTitle.text =
-            resources.getQuantityText(R.plurals.numberOfPeopleInterested, rooms.size)
+            resources.getQuantityString(R.plurals.numberOfPeopleInterested,
+                rooms.size, rooms.size)
 
         val context = this
         //set up our recyclerview
