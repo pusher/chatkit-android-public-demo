@@ -3,8 +3,9 @@ package com.pusher.demo.features.marketplace
 import android.content.Context
 import com.pusher.chatkit.*
 import com.pusher.chatkit.ChatManager
+import com.pusher.chatkit.presence.Presence
+import com.pusher.chatkit.users.User
 import com.pusher.util.Result
-import elements.Error
 
 object ChatkitManager {
 
@@ -15,9 +16,23 @@ object ChatkitManager {
     private lateinit var chatManager: ChatManager
     var currentUser: CurrentUser? = null
 
-    interface ChatManagerConnectedListener{
+    interface ChatManagerConnectedListener {
         fun onConnected(user: CurrentUser)
         fun onError(error: String)
+    }
+
+    interface ChatManagerAllUsersListener {
+        fun onUsers(users: List<User>)
+        fun onError(error: String)
+    }
+
+    private var chatListeners = ArrayList<ChatListeners>()
+    fun addChatListener(listener: ChatListeners) {
+        chatListeners.add(listener)
+    }
+
+    fun removeChatListener(listener: ChatListeners) {
+        chatListeners.remove(listener)
     }
 
     fun connect(context: Context, userId: String, listener: ChatManagerConnectedListener) {
@@ -58,7 +73,25 @@ object ChatkitManager {
 
         //connect to chatkit
         chatManager.connect(
-            listeners = ChatListeners(),
+            listeners = ChatListeners(
+
+                onRoomUpdated = {
+                    if (chatListeners.size > 0) {
+                        for (roomUpdatedListener in chatListeners) {
+                            roomUpdatedListener.onRoomUpdated(it)
+                        }
+                    }
+                },
+
+                onPresenceChanged = { user: User, newPresence: Presence, oldPresence: Presence ->
+                    if (chatListeners.size > 0) {
+                        for (presenceChangedListener in chatListeners) {
+                            presenceChangedListener.onPresenceChanged(user, newPresence, oldPresence)
+                        }
+                    }
+                }
+
+            ),
             callback = { result ->
                 when (result) {
                     is Result.Success -> {
@@ -75,4 +108,18 @@ object ChatkitManager {
             }
         )
     }
+
+    fun getAllUsersInitialState(listener: ChatkitManager.ChatManagerAllUsersListener) {
+        currentUser!!.users {
+            when (it) {
+                is Result.Success -> {
+                    listener.onUsers(it.value)
+                }
+                is Result.Failure -> {
+                    listener.onError(it.error.reason)
+                }
+            }
+        }
+    }
+
 }

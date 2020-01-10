@@ -31,6 +31,11 @@ class SellerActivity : AppCompatActivity(),
 
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.endSubscriptionToRoomUpdates()
+    }
+
     override fun onConnected(user: CurrentUser) {
         //display all the conversations
         runOnUiThread {
@@ -66,10 +71,7 @@ class SellerActivity : AppCompatActivity(),
         recyclerViewPeople.layoutManager =  LinearLayoutManager(this)
         recyclerViewPeople.adapter = adapter
 
-        //currently we have to subscribe to the room to get the people but we can change this soon!
-        for (room in rooms) {
-            presenter.subscribeToRoom(room)
-        }
+        presenter.subscribeToRoomUpdates()
 
     }
 
