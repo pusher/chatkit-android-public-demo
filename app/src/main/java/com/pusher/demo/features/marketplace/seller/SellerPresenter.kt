@@ -6,11 +6,9 @@ import com.pusher.chatkit.ChatListeners
 import com.pusher.chatkit.CurrentUser
 import com.pusher.chatkit.presence.Presence
 import com.pusher.chatkit.rooms.Room
-import com.pusher.chatkit.rooms.RoomListeners
 import com.pusher.chatkit.users.User
 import com.pusher.demo.features.BasePresenter
 import com.pusher.demo.features.marketplace.ChatkitManager
-import com.pusher.util.Result
 
 class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
 
@@ -65,7 +63,7 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
 
         ChatkitManager.getUsersFromMyJoinedRooms(object: ChatkitManager.JoinedRoomsMembersListener {
             override fun onMembersFetched(members: List<User>) {
-                reconcileUsers(members)
+                reconcileFetchedBuyers(members)
             }
 
             override fun onError(error: String) {
@@ -76,29 +74,13 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
 
     }
 
-    private fun reconcileUsers(users: List<User>) {
+    private fun reconcileFetchedBuyers(buyers: List<User>) {
 
         for (room in ChatkitManager.currentUser!!.rooms) {
 
             val otherMemberId = room.memberUserIds.find { userId-> userId != ChatkitManager.currentUser!!.id }!!
-
-            if (otherMemberId == null) {
-                val error = "Couldn't find any other people in room " + room.name
-                Log.e(ChatkitManager.LOG_TAG, error)
-                view?.onError(error)
-            } else {
-
-                val otherMember = users.find{ user -> user.id == otherMemberId}!!
-
-                if (otherPerson == null) {
-                    val error = "Couldn't match the user id:$otherMemberId to a user object"
-                    Log.e(ChatkitManager.LOG_TAG, error)
-                    view?.onError(error)
-                } else {
-                    view?.onPerson(otherPerson, room)
-                }
-
-            }
+            val otherMember = buyers.find{ user -> user.id == otherMemberId}!!
+            view?.onPerson(otherMember, room)
 
         }
 

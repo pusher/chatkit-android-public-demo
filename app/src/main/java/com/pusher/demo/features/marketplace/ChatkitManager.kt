@@ -9,8 +9,8 @@ import com.pusher.util.Result
 
 object ChatkitManager {
 
-    private val INSTANCE_LOCATOR = "FILL_ME_IN"
-    private val TOKEN_PROVIDER_URL = "FILL_ME_IN"
+    private val INSTANCE_LOCATOR = "v1:us1:ddcaffd5-b8cf-49c8-b6ff-441b89b75895"
+    private val TOKEN_PROVIDER_URL = "https://us1.pusherplatform.io/services/chatkit_token_provider/v1/ddcaffd5-b8cf-49c8-b6ff-441b89b75895/token"
     val LOG_TAG = "DEMO_APP"
 
     private lateinit var chatManager: ChatManager
