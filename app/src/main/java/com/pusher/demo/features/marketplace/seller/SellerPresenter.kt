@@ -88,7 +88,7 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
                 view?.onError(error)
             } else {
 
-                val otherPerson = users.find{ user -> user.id == otherMemberId}
+                val otherMember = users.find{ user -> user.id == otherMemberId}!!
 
                 if (otherPerson == null) {
                     val error = "Couldn't match the user id:$otherMemberId to a user object"
