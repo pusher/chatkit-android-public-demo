@@ -16,7 +16,7 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
         fun onConnected(user: CurrentUser)
         fun onError(error: String)
         fun onMemberPresenceChanged(user: User)
-        fun onPerson(user: User, room: Room)
+        fun onBuyer(user: User, room: Room)
         fun onUnreadCountChanged(room: Room)
     }
 
@@ -80,7 +80,7 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
 
             val otherMemberId = room.memberUserIds.find { userId-> userId != ChatkitManager.currentUser!!.id }!!
             val otherMember = buyers.find{ user -> user.id == otherMemberId}!!
-            view?.onPerson(otherMember, room)
+            view?.onBuyer(otherMember, room)
 
         }
 

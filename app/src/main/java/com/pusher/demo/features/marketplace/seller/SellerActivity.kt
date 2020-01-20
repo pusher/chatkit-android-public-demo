@@ -89,7 +89,7 @@ class SellerActivity : AppCompatActivity(),
         }
     }
 
-    override fun onPerson(user: User, room: Room) {
+    override fun onBuyer(user: User, room: Room) {
         runOnUiThread {
             adapter.addPerson(user, room)
         }
