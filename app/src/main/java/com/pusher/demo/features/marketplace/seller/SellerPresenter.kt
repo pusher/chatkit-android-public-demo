@@ -9,8 +9,11 @@ import com.pusher.chatkit.rooms.Room
 import com.pusher.chatkit.users.User
 import com.pusher.demo.features.BasePresenter
 import com.pusher.demo.features.marketplace.ChatkitManager
+import com.pusher.util.Result
 
 class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
+
+    val LOG_TAG = "DEMO_APP"
 
     interface View {
         fun onConnected(user: CurrentUser)
@@ -61,17 +64,22 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
 
         ChatkitManager.addChatListener(chatListeners)
 
-        ChatkitManager.getUsersFromMyJoinedRooms(object: ChatkitManager.JoinedRoomsMembersListener {
-            override fun onMembersFetched(members: List<User>) {
-                reconcileFetchedBuyers(members)
+        getUsersFromMyJoinedRooms()
+
+    }
+
+    private fun getUsersFromMyJoinedRooms() {
+        ChatkitManager.currentUser!!.users {
+            when (it) {
+                is Result.Success -> {
+                    reconcileFetchedBuyers(it.value)
+                }
+                is Result.Failure -> {
+                    Log.d(LOG_TAG, "error fetching users from rooms you have joined: "
+                            + it.error.reason)
+                }
             }
-
-            override fun onError(error: String) {
-                //todo: handle this D:
-            }
-
-        })
-
+        }
     }
 
     private fun reconcileFetchedBuyers(buyers: List<User>) {

@@ -21,11 +21,6 @@ object ChatkitManager {
         fun onError(error: String)
     }
 
-    interface JoinedRoomsMembersListener {
-        fun onMembersFetched(members: List<User>)
-        fun onError(error: String)
-    }
-
     private var chatListeners = ArrayList<ChatListeners>()
     fun addChatListener(listener: ChatListeners) {
         chatListeners.add(listener)
@@ -107,19 +102,6 @@ object ChatkitManager {
                 }
             }
         )
-    }
-
-    fun getUsersFromMyJoinedRooms(listener: JoinedRoomsMembersListener) {
-        currentUser!!.users {
-            when (it) {
-                is Result.Success -> {
-                    listener.onMembersFetched(it.value)
-                }
-                is Result.Failure -> {
-                    listener.onError(it.error.reason)
-                }
-            }
-        }
     }
 
 }
