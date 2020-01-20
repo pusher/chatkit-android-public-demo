@@ -63,9 +63,9 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
 
         ChatkitManager.addChatListener(chatListeners)
 
-        ChatkitManager.getAllUsersInitialState(object: ChatkitManager.ChatManagerAllUsersListener{
-            override fun onUsers(users: List<User>) {
-                reconcileUsers(users)
+        ChatkitManager.getUsersFromMyJoinedRooms(object: ChatkitManager.JoinedRoomsMembersListener {
+            override fun onMembersFetched(members: List<User>) {
+                reconcileUsers(members)
             }
 
             override fun onError(error: String) {
