@@ -80,7 +80,7 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
 
         for (room in ChatkitManager.currentUser!!.rooms) {
 
-            val otherMemberId = room.memberUserIds.find { userId-> userId != ChatkitManager.currentUser!!.id }
+            val otherMemberId = room.memberUserIds.find { userId-> userId != ChatkitManager.currentUser!!.id }!!
 
             if (otherMemberId == null) {
                 val error = "Couldn't find any other people in room " + room.name
