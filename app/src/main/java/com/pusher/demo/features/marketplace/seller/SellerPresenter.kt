@@ -2,9 +2,9 @@ package com.pusher.demo.features.marketplace.seller
 
 import android.content.Context
 import android.util.Log
-import com.pusher.chatkit.ChatListeners
+import com.pusher.chatkit.ChatEvent
+import com.pusher.chatkit.ChatManagerEventConsumer
 import com.pusher.chatkit.CurrentUser
-import com.pusher.chatkit.presence.Presence
 import com.pusher.chatkit.rooms.Room
 import com.pusher.chatkit.users.User
 import com.pusher.demo.features.BasePresenter
@@ -23,8 +23,6 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
         fun onUnreadCountChanged(room: Room)
     }
 
-    private lateinit var chatListeners: ChatListeners
-
     fun connectToChatkit(context: Context) {
 
         ChatkitManager.connect(
@@ -38,11 +36,23 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
                 override fun onError(error: String) {
                     view?.onError(error)
                 }
+            },
+            object:ChatManagerEventConsumer {
+                override fun invoke(event: ChatEvent) {
+                    if (event is ChatEvent.RoomUpdated) {
+                        view?.onUnreadCountChanged(event.room)
+                    }
+
+                    if (event is ChatEvent.PresenceChange) {
+                        view?.onMemberPresenceChanged(event.user)
+                    }
+                }
             })
     }
 
     fun endSubscriptionToRoomUpdates() {
-        ChatkitManager.removeChatListener(chatListeners)
+        // disconnect from chatkit which will also end our subscriptions
+        ChatkitManager.disconnect()
     }
 
     fun subscribeToRoomUpdates() {
@@ -52,17 +62,6 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
             Log.e(ChatkitManager.LOG_TAG, "Current user was not found - have you signed in?")
             return
         }
-
-        chatListeners = ChatListeners(
-            onRoomUpdated = {
-                view?.onUnreadCountChanged(it)
-            },
-            onPresenceChanged = { user: User, newPresence: Presence, oldPresence: Presence ->
-                view?.onMemberPresenceChanged(user)
-            }
-        )
-
-        ChatkitManager.addChatListener(chatListeners)
 
         getUsersFromMyJoinedRooms()
 

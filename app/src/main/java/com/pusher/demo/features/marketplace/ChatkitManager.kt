@@ -21,16 +21,8 @@ object ChatkitManager {
         fun onError(error: String)
     }
 
-    private var chatListeners = ArrayList<ChatListeners>()
-    fun addChatListener(listener: ChatListeners) {
-        chatListeners.add(listener)
-    }
-
-    fun removeChatListener(listener: ChatListeners) {
-        chatListeners.remove(listener)
-    }
-
-    fun connect(context: Context, userId: String, listener: ChatManagerConnectedListener) {
+    fun connect(context: Context, userId: String, listener: ChatManagerConnectedListener,
+                consumer: ChatManagerEventConsumer?) {
 
         //check if we're already connected
         if (currentUser != null){
@@ -38,7 +30,7 @@ object ChatkitManager {
             chatManager.close {
                 when (it) {
                     is Result.Success -> {
-                        connectToChatkit(context, userId, listener)
+                        connectToChatkit(context, userId, listener, consumer)
                     }
                     is Result.Failure -> {
                         listener.onError(it.error.reason)
@@ -46,12 +38,13 @@ object ChatkitManager {
                 }
             }
         } else {
-            connectToChatkit(context, userId, listener)
+            connectToChatkit(context, userId, listener, consumer)
         }
 
     }
 
-    private fun connectToChatkit(context: Context, userId: String, listener: ChatManagerConnectedListener) {
+    private fun connectToChatkit(context: Context, userId: String,
+                                 listener: ChatManagerConnectedListener, consumer: ChatManagerEventConsumer?) {
 
         //set up your chat manager with your instance locator and token provider
         chatManager = ChatManager(
@@ -68,25 +61,9 @@ object ChatkitManager {
 
         //connect to chatkit
         chatManager.connect(
-            listeners = ChatListeners(
-
-                onRoomUpdated = {
-                    if (chatListeners.size > 0) {
-                        for (roomUpdatedListener in chatListeners) {
-                            roomUpdatedListener.onRoomUpdated(it)
-                        }
-                    }
-                },
-
-                onPresenceChanged = { user: User, newPresence: Presence, oldPresence: Presence ->
-                    if (chatListeners.size > 0) {
-                        for (presenceChangedListener in chatListeners) {
-                            presenceChangedListener.onPresenceChanged(user, newPresence, oldPresence)
-                        }
-                    }
-                }
-
-            ),
+            consumer = {event ->
+                consumer?.let { consumer.invoke(event) }
+            },
             callback = { result ->
                 when (result) {
                     is Result.Success -> {
@@ -102,6 +79,10 @@ object ChatkitManager {
                 }
             }
         )
+    }
+
+    fun disconnect() {
+        chatManager.close { }
     }
 
 }
