@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".features.marketplace.chat.MarketplaceChatActivity">
+    tools:context=".features.marketplace.chat.MarketplaceChatActivity"
+    android:background="@color/background_chat">
 
     <!-- top bar-->
     <RelativeLayout
@@ -49,10 +50,10 @@
         android:id="@+id/containerBottomBar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@color/light_orange"
         android:layout_alignParentBottom="true"
         android:elevation="5dp"
         >
+
         <EditText
             android:id="@+id/txtMessage"
             android:layout_width="match_parent"
@@ -61,7 +62,11 @@
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:singleLine="true"
+            android:textColor="@color/pusher_dark_purple"
+            android:hint="Type a new message"
+            android:backgroundTint="#E9E9FC"
             android:imeOptions="actionSend"/>
+
     </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView

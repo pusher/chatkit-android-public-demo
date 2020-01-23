@@ -2,11 +2,15 @@
 <resources>
     <color name="colorPrimary">#7877FF</color>
     <color name="colorPrimaryDark">#5D5CFF</color>
-    <color name="colorAccent">#FF8473</color>
+    <color name="colorAccent">#300D4F</color>
 
     <color name="dark_text">#323133</color>
     <color name="light_text">#F5F7FA</color>
     <color name="light_purple">#A8A7FF</color>
     <color name="light_orange">#FCDCD6</color>
     <color name="green">#02de72</color>
+
+    <color name="pusher_dark_purple">#300D4F</color>
+    <color name="pusher_light_purple">#F4F4FE</color>
+    <color name="background_chat">#ffffff</color>
 </resources>

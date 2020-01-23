@@ -4,22 +4,14 @@ import android.view.View
 import com.pusher.chatkit.messages.multipart.Message
 import com.pusher.chatkit.messages.multipart.Payload
 import com.pusher.demo.R
-import kotlinx.android.synthetic.main.row_message.view.*
+import kotlinx.android.synthetic.main.row_message_from_other.view.*
 
-class MessageViewHolder (itemView: View)
+open class MessageViewHolder (itemView: View)
     : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
-    fun bind(message: Message, currentUserId: String){
+    fun bind(message: Message){
         val inlineMessage: Payload.Inline = message.parts[0].payload as Payload.Inline
-        if (message.sender.id == currentUserId) {
-            itemView.lblMessageFromYou.visibility = View.VISIBLE
-            itemView.lblMessageFromYou.text = inlineMessage.content
-            itemView.lblMessageFromOther.visibility = View.GONE
-        } else {
-            itemView.lblMessageFromOther.visibility = View.VISIBLE
-            itemView.lblMessageFromOther.text = inlineMessage.content
-            itemView.lblMessageFromYou.visibility = View.GONE
-        }
+        itemView.lblMessage.text = inlineMessage.content
     }
 
     fun markAsRead(read: Boolean) {
@@ -29,7 +21,7 @@ class MessageViewHolder (itemView: View)
             R.drawable.sent_indicator
         }
 
-        itemView.lblMessageFromYou.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0,
+        itemView.lblMessage.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0,
             sentOrReadDrawableResId, 0)
     }
 
