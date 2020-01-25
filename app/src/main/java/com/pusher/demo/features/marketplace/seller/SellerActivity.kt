@@ -31,6 +31,11 @@ class SellerActivity : AppCompatActivity(),
 
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.endSubscriptionToRoomUpdates()
+    }
+
     override fun onConnected(user: CurrentUser) {
         //display all the conversations
         runOnUiThread {
@@ -52,7 +57,8 @@ class SellerActivity : AppCompatActivity(),
         // because we only have 1 product we can assume all conversations are to dow ith it!
 
         lblConversationsTitle.text =
-            resources.getQuantityText(R.plurals.numberOfPeopleInterested, rooms.size)
+            resources.getQuantityString(R.plurals.numberOfPeopleInterested,
+                rooms.size, rooms.size)
 
         val context = this
         //set up our recyclerview
@@ -65,10 +71,7 @@ class SellerActivity : AppCompatActivity(),
         recyclerViewPeople.layoutManager =  LinearLayoutManager(this)
         recyclerViewPeople.adapter = adapter
 
-        //currently we have to subscribe to the room to get the people but we can change this soon!
-        for (room in rooms) {
-            presenter.subscribeToRoom(room)
-        }
+        presenter.subscribeToRoomUpdates()
 
     }
 
@@ -86,7 +89,7 @@ class SellerActivity : AppCompatActivity(),
         }
     }
 
-    override fun onPerson(user: User, room: Room) {
+    override fun onBuyer(user: User, room: Room) {
         runOnUiThread {
             adapter.addPerson(user, room)
         }

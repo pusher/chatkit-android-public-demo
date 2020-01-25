@@ -34,7 +34,9 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
 
     //chatkit library
-    implementation 'com.pusher:chatkit-android:1.8.0'
+    //todo: revert this before releasing
+//    implementation 'com.pusher:chatkit-android:1.8.0'
+    implementation 'com.github.pusher:chatkit-android:49394fa0fc57ab558213369dfdcce9877e8ee197'
 
     //push notifications
     implementation 'com.google.firebase:firebase-analytics:17.2.0'

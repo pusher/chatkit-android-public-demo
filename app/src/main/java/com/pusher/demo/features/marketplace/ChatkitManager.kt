@@ -3,8 +3,9 @@ package com.pusher.demo.features.marketplace
 import android.content.Context
 import com.pusher.chatkit.*
 import com.pusher.chatkit.ChatManager
+import com.pusher.chatkit.presence.Presence
+import com.pusher.chatkit.users.User
 import com.pusher.util.Result
-import elements.Error
 
 object ChatkitManager {
 
@@ -15,12 +16,13 @@ object ChatkitManager {
     private lateinit var chatManager: ChatManager
     var currentUser: CurrentUser? = null
 
-    interface ChatManagerConnectedListener{
+    interface ChatManagerConnectedListener {
         fun onConnected(user: CurrentUser)
         fun onError(error: String)
     }
 
-    fun connect(context: Context, userId: String, listener: ChatManagerConnectedListener) {
+    fun connect(context: Context, userId: String, listener: ChatManagerConnectedListener,
+                consumer: ChatManagerEventConsumer?) {
 
         //check if we're already connected
         if (currentUser != null){
@@ -28,7 +30,7 @@ object ChatkitManager {
             chatManager.close {
                 when (it) {
                     is Result.Success -> {
-                        connectToChatkit(context, userId, listener)
+                        connectToChatkit(context, userId, listener, consumer)
                     }
                     is Result.Failure -> {
                         listener.onError(it.error.reason)
@@ -36,12 +38,13 @@ object ChatkitManager {
                 }
             }
         } else {
-            connectToChatkit(context, userId, listener)
+            connectToChatkit(context, userId, listener, consumer)
         }
 
     }
 
-    private fun connectToChatkit(context: Context, userId: String, listener: ChatManagerConnectedListener) {
+    private fun connectToChatkit(context: Context, userId: String,
+                                 listener: ChatManagerConnectedListener, consumer: ChatManagerEventConsumer?) {
 
         //set up your chat manager with your instance locator and token provider
         chatManager = ChatManager(
@@ -58,7 +61,9 @@ object ChatkitManager {
 
         //connect to chatkit
         chatManager.connect(
-            listeners = ChatListeners(),
+            consumer = {event ->
+                consumer?.let { consumer.invoke(event) }
+            },
             callback = { result ->
                 when (result) {
                     is Result.Success -> {
@@ -75,4 +80,9 @@ object ChatkitManager {
             }
         )
     }
+
+    fun disconnect() {
+        chatManager.close { }
+    }
+
 }

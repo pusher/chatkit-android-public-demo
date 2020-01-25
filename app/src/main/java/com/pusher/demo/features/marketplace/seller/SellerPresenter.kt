@@ -2,9 +2,10 @@ package com.pusher.demo.features.marketplace.seller
 
 import android.content.Context
 import android.util.Log
+import com.pusher.chatkit.ChatEvent
+import com.pusher.chatkit.ChatManagerEventConsumer
 import com.pusher.chatkit.CurrentUser
 import com.pusher.chatkit.rooms.Room
-import com.pusher.chatkit.rooms.RoomListeners
 import com.pusher.chatkit.users.User
 import com.pusher.demo.features.BasePresenter
 import com.pusher.demo.features.marketplace.ChatkitManager
@@ -12,11 +13,13 @@ import com.pusher.util.Result
 
 class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
 
+    val LOG_TAG = "DEMO_APP"
+
     interface View {
         fun onConnected(user: CurrentUser)
         fun onError(error: String)
         fun onMemberPresenceChanged(user: User)
-        fun onPerson(user: User, room: Room)
+        fun onBuyer(user: User, room: Room)
         fun onUnreadCountChanged(room: Room)
     }
 
@@ -33,10 +36,26 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
                 override fun onError(error: String) {
                     view?.onError(error)
                 }
+            },
+            object:ChatManagerEventConsumer {
+                override fun invoke(event: ChatEvent) {
+                    if (event is ChatEvent.RoomUpdated) {
+                        view?.onUnreadCountChanged(event.room)
+                    }
+
+                    if (event is ChatEvent.PresenceChange) {
+                        view?.onMemberPresenceChanged(event.user)
+                    }
+                }
             })
     }
 
-    fun subscribeToRoom(room: Room) {
+    fun endSubscriptionToRoomUpdates() {
+        // disconnect from chatkit which will also end our subscriptions
+        ChatkitManager.disconnect()
+    }
+
+    fun subscribeToRoomUpdates() {
 
         if (ChatkitManager.currentUser == null) {
             view?.onError("Current user was not found - have you signed in?")
@@ -44,51 +63,34 @@ class SellerPresenter :  BasePresenter<SellerPresenter.View>(){
             return
         }
 
-        //subscribe to the room
-        ChatkitManager.currentUser!!.subscribeToRoomMultipart(
-            roomId = room.id ,
-            listeners = RoomListeners(
-                onPresenceChange = { person ->
-                    if (person.id != ChatkitManager.currentUser!!.id) {
-                        view?.onMemberPresenceChanged(person)
-                    }
-                },
-                onMultipartMessage = {
-                    view?.onUnreadCountChanged(it.room)
-                }
-            ),
-            messageLimit = 0,
-            callback = { subscription ->
-                //success
-                getMembersForRoom(room)
-            }
-        )
+        getUsersFromMyJoinedRooms()
+
     }
 
-    private fun getMembersForRoom(room: Room){
-        //get members for room
-        ChatkitManager.currentUser!!.usersForRoom( room.id, callback = { result ->
-            when (result) {
+    private fun getUsersFromMyJoinedRooms() {
+        ChatkitManager.currentUser!!.users {
+            when (it) {
                 is Result.Success -> {
-                    result.value.let { members ->
-                        //check we actually have another user to talk to
-                        val otherMember = members.find { user-> user.id != ChatkitManager.currentUser!!.id }
-                        if (otherMember == null) {
-                            val error = "Couldn't find any other people in room " + room.name
-                            Log.e(ChatkitManager.LOG_TAG, error)
-                            view?.onError(error)
-                        } else {
-                            view?.onPerson(otherMember, room)
-                        }
-                    }
+                    reconcileFetchedBuyers(it.value)
                 }
-
                 is Result.Failure -> {
-                    Log.e(ChatkitManager.LOG_TAG, result.error.reason)
-                    view?.onError(result.error.reason)
+                    Log.d(LOG_TAG, "error fetching users from rooms you have joined: "
+                            + it.error.reason)
                 }
-
             }
-        })
+        }
     }
+
+    private fun reconcileFetchedBuyers(buyers: List<User>) {
+
+        for (room in ChatkitManager.currentUser!!.rooms) {
+
+            val otherMemberId = room.memberUserIds.find { userId-> userId != ChatkitManager.currentUser!!.id }!!
+            val otherMember = buyers.find{ user -> user.id == otherMemberId}!!
+            view?.onBuyer(otherMember, room)
+
+        }
+
+    }
+
 }

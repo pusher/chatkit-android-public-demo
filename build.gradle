@@ -19,7 +19,8 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
+        //todo: remove this before releasing
+        maven { url 'https://jitpack.io' }
     }
 }
 
